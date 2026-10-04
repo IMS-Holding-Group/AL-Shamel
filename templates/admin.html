@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة الإدارة - الشامل</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    </head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fa-solid fa-car"></i>
+                    <h1>الشامل</h1>
+                </div>
+                <nav class="nav">
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                        <li><a href="{{ url_for('search') }}">البحث</a></li>
+                        <li><a href="{{ url_for('orders') }}">الطلبات</a></li>
+                        <li><a href="{{ url_for('admin') }}" class="active">تسجيل الدخول</a></li>
+                    </ul>
+                </nav>
+                <div class="header-actions">
+                    <a href="{{ url_for('index') }}" class="btn btn-secondary"><i class="fa-solid fa-home"></i> الرئيسية</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Admin Login Section -->
+    <section class="admin-section" id="adminSection">
+        <div class="container">
+            <div class="admin-login-container">
+                <div class="login-card">
+                    <div class="login-header">
+                        <h2>تسجيل الدخول</h2>
+                        <p>تسجيل الدخول للوصول إلى لوحة التحكم</p>
+                    </div>
+
+                    <form id="adminLoginForm" class="login-form">
+                        <div class="form-group">
+                            <label for="email">البريد الإلكتروني</label>
+                            <input type="email" id="email" name="email" required>
+                            </div>
+
+                        <div class="form-group">
+                            <label for="password">كلمة المرور</label>
+                            <input type="password" id="password" name="password" required>
+                            </div>
+
+                        <button type="submit" class="btn btn-primary btn-full"><i class="fa-solid fa-sign-in-alt"></i> تسجيل الدخول</button>
+                        
+                        <div style="text-align: center; margin-top: 1.5rem;">
+                            <p style="color: var(--text-secondary);">
+                                ليس لديك حساب؟ 
+                                <a href="{{ url_for('register') }}" style="color: var(--primary-color); font-weight: 600;">إنشاء حساب جديد</a>
+                            </p>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Admin Dashboard (Hidden by default) -->
+    <div id="adminDashboard" class="admin-dashboard" style="display: none;">
+        <div class="container">
+            <div class="dashboard-header">
+                <h2>لوحة التحكم</h2>
+                <div class="dashboard-actions" style="display: flex; gap: 1rem; align-items: center;">
+                    <button class="btn btn-primary" onclick="toggleNotifications()" style="position: relative;">
+                        <i class="fa-solid fa-bell"></i> الإشعارات
+                        <span id="notificationBadge" class="notification-badge" style="display: none; position: absolute; top: -8px; left: -8px; background: var(--error-color); color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 0.75rem; display: flex; align-items: center; justify-content: center;">0</span>
+                    </button>
+                    <button class="btn btn-secondary" onclick="logout()"><i class="fa-solid fa-sign-out-alt"></i> تسجيل الخروج</button>
+                </div>
+            </div>
+            
+            <!-- Notifications Panel -->
+            <div id="notificationsPanel" class="notifications-panel" style="display: none; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; max-height: 400px; overflow-y: auto;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3 style="margin: 0;"><i class="fa-solid fa-bell"></i> الإشعارات</h3>
+                    <button class="btn btn-sm btn-secondary" onclick="markAllAsRead()"><i class="fa-solid fa-check-double"></i> تحديد الكل كمقروء</button>
+                </div>
+                <div id="notificationsList">
+                    <!-- سيتم تحميل الإشعارات هنا -->
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+                        <i class="fa-solid fa-users" style="font-size: 1.5rem; color: white;"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>المستخدمين</h3>
+                        <div class="stat-number">1,247</div>
+                        <div class="stat-change positive">
+                            +12.5%
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+                        <i class="fa-solid fa-box" style="font-size: 1.5rem; color: white;"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>المنتجات</h3>
+                        <div class="stat-number">30</div>
+                        <div class="stat-change positive">
+                            +5.2%
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+                        <i class="fa-solid fa-truck" style="font-size: 1.5rem; color: white;"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>الموردين</h3>
+                        <div class="stat-number">4</div>
+                        <div class="stat-change neutral">
+                            0%
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+                        <i class="fa-solid fa-dollar-sign" style="font-size: 1.5rem; color: white;"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>المبيعات</h3>
+                        <div class="stat-number">45,230 ريال</div>
+                        <div class="stat-change positive">
+                            +18.3%
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+                        <i class="fa-solid fa-chart-line" style="font-size: 1.5rem; color: white;"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>هامش الربح</h3>
+                        <div class="stat-number">23.5%</div>
+                        <div class="stat-change positive">
+                            +2.1%
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+                        <i class="fa-solid fa-wallet" style="font-size: 1.5rem; color: white;"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>صافي الربح</h3>
+                        <div class="stat-number">10,628 ريال</div>
+                        <div class="stat-change positive">
+                            +15.7%
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+                        <i class="fa-solid fa-shopping-cart" style="font-size: 1.5rem; color: white;"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>متوسط السلة</h3>
+                        <div class="stat-number">180 ريال</div>
+                        <div class="stat-change positive">
+                            +8.4%
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+                        <i class="fa-solid fa-eye" style="font-size: 1.5rem; color: white;"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>متوسط الزوار</h3>
+                        <div class="stat-number">2,450</div>
+                        <div class="stat-change positive">
+                            +22.1%
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+                        <i class="fa-solid fa-receipt" style="font-size: 1.5rem; color: white;"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>المصروفات</h3>
+                        <div class="stat-number">8,750 ريال</div>
+                        <div class="stat-change negative">
+                            +5.3%
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Management Sections -->
+            <div class="management-sections">
+                <div class="management-card">
+                    <h3>إدارة الموردين</h3>
+                    <div class="suppliers-list" id="quickSuppliersList">
+                        <!-- سيتم تحميلها من القاعدة -->
+                    </div>
+                    <button class="btn btn-primary btn-full" onclick="showAddSupplierModal()">
+                        <i class="fa-solid fa-plus"></i> إضافة مورد جديد
+                    </button>
+                </div>
+
+                <div class="management-card">
+                    <h3>إدارة المنتجات</h3>
+                    <div class="products-summary" id="productsSummary">
+                        <div class="summary-item">
+                            <span>إجمالي المنتجات:</span>
+                            <strong id="totalProductsCount">0 منتج</strong>
+                        </div>
+                        <div class="summary-item">
+                            <span>المنتجات الأصلية:</span>
+                            <strong id="originalProductsCount">0 منتج</strong>
+                        </div>
+                        <div class="summary-item">
+                            <span>المنتجات التجارية:</span>
+                            <strong id="commercialProductsCount">0 منتج</strong>
+                        </div>
+                    </div>
+                    <div class="product-actions">
+                        <button class="btn btn-primary" onclick="showAddProductModal()">
+                            <i class="fa-solid fa-plus"></i> إضافة منتج
+                        </button>
+                        <button class="btn btn-secondary" onclick="showTab('products')">
+                            <i class="fa-solid fa-list"></i> عرض جميع المنتجات
+                        </button>
+                    </div>
+                </div>
+
+                <div class="management-card">
+                    <h3>التقارير</h3>
+                    <div class="reports-list">
+                        <div class="report-item">
+                            <span>تقرير المبيعات الشهري</span>
+                            <button class="btn btn-sm btn-primary"><i class="fa-solid fa-eye"></i> عرض</button>
+                        </div>
+                        <div class="report-item">
+                            <span>تقرير المنتجات الأكثر مبيعاً</span>
+                            <button class="btn btn-sm btn-primary"><i class="fa-solid fa-eye"></i> عرض</button>
+                        </div>
+                        <div class="report-item">
+                            <span>تقرير الأداء المالي</span>
+                            <button class="btn btn-sm btn-primary"><i class="fa-solid fa-eye"></i> عرض</button>
+                        </div>
+                        <div class="report-item">
+                            <span>تقرير العملاء</span>
+                            <button class="btn btn-sm btn-primary"><i class="fa-solid fa-eye"></i> عرض</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Tabs -->
+            <div class="dashboard-tabs">
+                <button class="tab-btn active" onclick="showTab('orders')">
+                    إدارة الطلبات
+                </button>
+                <button class="tab-btn" onclick="showTab('products')">
+                    إدارة المنتجات
+                </button>
+                <button class="tab-btn" onclick="showTab('suppliers')">
+                    إدارة الموردين
+                </button>
+                <button class="tab-btn" onclick="showTab('reports')">
+                    التقارير
+                </button>
+            </div>
+
+            <!-- Orders Tab -->
+            <div id="ordersTab" class="tab-content active">
+                <div class="tab-header">
+                    <h3>إدارة الطلبات</h3>
+                    <button class="btn btn-primary" onclick="refreshOrders()"><i class="fa-solid fa-sync"></i> تحديث</button>
+                </div>
+                <div id="ordersList" class="orders-list">
+                    <!-- سيتم تحميل الطلبات هنا -->
+                </div>
+            </div>
+
+            <!-- Products Tab -->
+            <div id="productsTab" class="tab-content">
+                <div class="tab-header">
+                    <h3>إدارة المنتجات</h3>
+                    <button class="btn btn-primary" onclick="showAddProductModal()">
+                        إضافة منتج
+                    </button>
+                </div>
+                <div id="productsList" class="products-list">
+                    <!-- سيتم تحميل المنتجات هنا -->
+                </div>
+            </div>
+
+            <!-- Suppliers Tab -->
+            <div id="suppliersTab" class="tab-content">
+                <div class="tab-header">
+                    <h3>إدارة الموردين</h3>
+                    <button class="btn btn-primary" onclick="showAddSupplierModal()">
+                        إضافة مورد
+                    </button>
+                </div>
+                <div id="suppliersList" class="suppliers-list">
+                    <!-- سيتم تحميل الموردين هنا -->
+                </div>
+            </div>
+
+            <!-- Reports Tab -->
+            <div id="reportsTab" class="tab-content">
+                <div class="tab-header">
+                    <h3>التقارير</h3>
+                    <button class="btn btn-primary" onclick="generateReport()">
+                        تحميل التقرير
+                    </button>
+                </div>
+                <div class="reports-content">
+                    <div class="report-card">
+                        <h4>تقرير المبيعات</h4>
+                        <div class="report-stats">
+                            <div class="report-stat">
+                                <span class="label">إجمالي المبيعات:</span>
+                                <span class="value" id="totalSales">0 ريال</span>
+                            </div>
+                            <div class="report-stat">
+                                <span class="label">عدد الطلبات:</span>
+                                <span class="value" id="totalOrdersReport">0</span>
+                            </div>
+                            <div class="report-stat">
+                                <span class="label">متوسط قيمة الطلب:</span>
+                                <span class="value" id="avgOrderValue">0 ريال</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Supplier Modal -->
+    <div id="addSupplierModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAddSupplierModal()">&times;</span>
+            <h2 id="supplierModalTitle">إضافة مورد جديد</h2>
+            <form id="addSupplierForm" class="supplier-form">
+                <input type="hidden" id="supplierIdEdit" name="supplier_id">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="supplierName">اسم المورد</label>
+                        <input type="text" id="supplierName" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="supplierLocation">الموقع</label>
+                        <input type="text" id="supplierLocation" name="location" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="supplierPhone">رقم الهاتف</label>
+                        <input type="tel" id="supplierPhone" name="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="supplierEmail">البريد الإلكتروني</label>
+                        <input type="email" id="supplierEmail" name="email" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="supplierType">النوع</label>
+                        <select id="supplierType" name="type" required>
+                            <option value="وكيل رسمي">وكيل رسمي</option>
+                            <option value="مورد معتمد">مورد معتمد</option>
+                            <option value="تاجر">تاجر</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="supplierRating">التقييم</label>
+                        <input type="number" id="supplierRating" name="rating" min="0" max="5" step="0.1" value="4.0">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-save"></i> حفظ المورد
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Product Modal -->
+    <div id="addProductModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAddProductModal()">&times;</span>
+            <h2 id="productModalTitle">إضافة منتج جديد</h2>
+            <form id="addProductForm" class="product-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="productName">اسم المنتج</label>
+                        <input type="text" id="productName" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="partNumber">رقم القطعة</label>
+                        <input type="text" id="partNumber" name="part_number" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="productBrand">العلامة التجارية</label>
+                        <input type="text" id="productBrand" name="brand" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="productCategory">الفئة</label>
+                        <select id="productCategory" name="category" required>
+                            <option value="">اختر الفئة</option>
+                            <option value="فلاتر">فلاتر</option>
+                            <option value="مكابح">مكابح</option>
+                            <option value="إشعال">إشعال</option>
+                            <option value="محرك">محرك</option>
+                            <option value="نظام كهربائي">نظام كهربائي</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="productPrice">السعر</label>
+                        <input type="number" id="productPrice" name="price" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="originalPrice">السعر الأصلي</label>
+                        <input type="number" id="originalPrice" name="original_price" step="0.01">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="productStock">المخزون</label>
+                        <input type="number" id="productStock" name="stock" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="productType">النوع</label>
+                        <select id="productType" name="type" required>
+                            <option value="أصلية">أصلية</option>
+                            <option value="تجارية">تجارية</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="productSupplier">المورد</label>
+                    <select id="productSupplier" name="supplier" required>
+                        <option value="">اختر المورد</option>
+                        <option value="الوكيل الأصلي">الوكيل الأصلي</option>
+                        <option value="الحجر">الحجر</option>
+                        <option value="البرادي">البرادي</option>
+                        <option value="الناصر">الناصر</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="productDescription">الوصف</label>
+                    <textarea id="productDescription" name="description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="vinCompatible">متوافق مع أرقام الهيكل (مفصولة بفاصلة)</label>
+                    <input type="text" id="vinCompatible" name="vin_compatible" placeholder="VIN123456,VIN789012">
+                </div>
+                <div class="form-group">
+                    <label for="modelCompatible">متوافق مع الموديلات (مفصولة بفاصلة)</label>
+                    <input type="text" id="modelCompatible" name="model_compatible" placeholder="كامري 2020,كامري 2021">
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    إضافة المنتج
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>الشامل</h3>
+                    <p>منصة إلكترونية متكاملة لقطع غيار السيارات في عرعر - المملكة العربية السعودية</p>
+                </div>
+                <div class="footer-section">
+                    <h4>روابط سريعة</h4>
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                        <li><a href="{{ url_for('search') }}">البحث</a></li>
+                        <li><a href="{{ url_for('orders') }}">الطلبات</a></li>
+                        <li><a href="{{ url_for('admin') }}">الإدارة</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>تواصل معنا</h4>
+                    <p><i class="fa-solid fa-map-marker-alt"></i> عرعر - المملكة العربية السعودية</p>
+                    <p><i class="fa-solid fa-phone"></i> +966 50 123 4567</p>
+                    <p><i class="fa-solid fa-envelope"></i> info@alshamel.com</p>
+                </div>
+                <div class="footer-section">
+                    <h4>تابعنا</h4>
+                    <div class="social-links" style="display: flex; gap: 1rem; margin-top: 1rem;">
+                        <a href="#" style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white;"><i class="fa-brands fa-twitter"></i></a>
+                        <a href="#" style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white;"><i class="fa-brands fa-facebook"></i></a>
+                        <a href="#" style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white;"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white;"><i class="fa-brands fa-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 الشامل. جميع الحقوق محفوظة.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+</body>
+
+</html>

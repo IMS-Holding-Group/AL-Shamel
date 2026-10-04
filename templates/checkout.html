@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الدفع - الشامل</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fa-solid fa-car"></i>
+                    <h1>الشامل</h1>
+                </div>
+                <nav class="nav">
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                        <li><a href="{{ url_for('search') }}">البحث</a></li>
+                        <li><a href="{{ url_for('orders') }}">الطلبات</a></li>
+                        <li><a href="{{ url_for('admin') }}">تسجيل الدخول</a></li>
+                        <li><a href="{{ url_for('customer_dashboard') }}">لوحة التحكم</a></li>
+                    </ul>
+                </nav>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" onclick="openCart()"
+                        style="position: relative; margin-left: 10px;">
+                        <i class="fa-solid fa-shopping-cart"></i> السلة
+                        <span class="cart-count" id="cartCount" style="display: none; position: absolute; top: -8px; right: -8px; background: var(--error-color); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold;">0</span>
+                    </button>
+                    <a href="{{ url_for('index') }}" class="btn btn-secondary"><i class="fa-solid fa-home"></i>
+                        الرئيسية</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Checkout Section -->
+    <section class="checkout-section">
+        <div class="container">
+            <div class="checkout-header">
+                <h2>إتمام الطلب</h2>
+                <p>أكمل بياناتك لإتمام عملية الشراء</p>
+            </div>
+
+            <div class="checkout-content">
+                <div class="checkout-form">
+                    <form id="checkoutForm" class="checkout-form-content">
+                        <!-- Customer Information -->
+                        <div class="form-section">
+                            <h3>معلومات العميل</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="customer_name">الاسم الكامل *</label>
+                                    <input type="text" id="customer_name" name="customer_name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="customer_phone">رقم الهاتف *</label>
+                                    <input type="tel" id="customer_phone" name="customer_phone" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="customer_email">البريد الإلكتروني</label>
+                                <input type="email" id="customer_email" name="customer_email">
+                            </div>
+                        </div>
+
+                        <!-- Delivery Address -->
+                        <div class="form-section">
+                            <h3>عنوان التسليم</h3>
+                            <div class="form-group">
+                                <label for="address">العنوان التفصيلي *</label>
+                                <textarea id="address" name="address" rows="3" required
+                                    placeholder="عرعر - حي الملك فهد - شارع الأمير محمد بن عبدالعزيز - مبنى رقم 123"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Payment Method -->
+                        <div class="form-section">
+                            <h3>طريقة الدفع</h3>
+                            <div class="payment-methods">
+                                <div class="payment-option">
+                                    <input type="radio" id="mada" name="payment_method" value="mada" checked
+                                        onchange="toggleCardForm()">
+                                    <label for="mada" class="payment-label">
+                                        <div class="payment-icon">
+                                        </div>
+                                        <div class="payment-info">
+                                            <h4>مدى</h4>
+                                            <p>الدفع ببطاقة مدى</p>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="payment-option">
+                                    <input type="radio" id="visa" name="payment_method" value="visa"
+                                        onchange="toggleCardForm()">
+                                    <label for="visa" class="payment-label">
+                                        <div class="payment-icon">
+                                        </div>
+                                        <div class="payment-info">
+                                            <h4>فيزا / ماستركارد</h4>
+                                            <p>الدفع بالبطاقة الائتمانية</p>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="payment-option">
+                                    <input type="radio" id="tabby" name="payment_method" value="tabby"
+                                        onchange="toggleCardForm()">
+                                    <label for="tabby" class="payment-label">
+                                        <div class="payment-icon">
+                                        </div>
+                                        <div class="payment-info">
+                                            <h4>تابي</h4>
+                                            <p>ادفع على 4 أقساط بدون فوائد</p>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="payment-option">
+                                    <input type="radio" id="cash_on_delivery" name="payment_method"
+                                        value="cash_on_delivery" onchange="toggleCardForm()">
+                                    <label for="cash_on_delivery" class="payment-label">
+                                        <div class="payment-icon">
+                                        </div>
+                                        <div class="payment-info">
+                                            <h4>الدفع عند الاستلام</h4>
+                                            <p>ادفع عند استلام الطلب</p>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Card Payment Form -->
+                            <div id="cardPaymentForm" class="card-payment-form"
+                                style="display: block; margin-top: 2rem;">
+                                <h4>معلومات البطاقة</h4>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="card_number">رقم البطاقة *</label>
+                                        <input type="text" id="card_number" name="card_number"
+                                            placeholder="1234 5678 9012 3456" maxlength="19"
+                                            oninput="formatCardNumber(this)">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="card_name">اسم حامل البطاقة *</label>
+                                        <input type="text" id="card_name" name="card_name"
+                                            placeholder="الاسم كما هو مكتوب على البطاقة">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="card_expiry">تاريخ الانتهاء *</label>
+                                        <input type="text" id="card_expiry" name="card_expiry" placeholder="MM/YY"
+                                            maxlength="5" oninput="formatExpiry(this)">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="card_cvv">CVV *</label>
+                                        <input type="text" id="card_cvv" name="card_cvv" placeholder="123" maxlength="3"
+                                            oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Order Summary -->
+                        <div class="form-section">
+                            <h3>ملخص الطلب</h3>
+                            <div class="order-summary">
+                                <div class="summary-items" id="summaryItems">
+                                    <!-- سيتم إضافة العناصر هنا -->
+                                </div>
+                                <div class="summary-total">
+                                    <div class="total-row">
+                                        <span>المجموع الفرعي:</span>
+                                        <span id="subtotal">0.00 ريال</span>
+                                    </div>
+                                    <div class="total-row">
+                                        <span>رسوم التوصيل:</span>
+                                        <span>0.00 ريال</span>
+                                    </div>
+                                    <div class="total-row total-final">
+                                        <span>المجموع الإجمالي:</span>
+                                        <span id="totalAmount">0.00 ريال</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="form-section">
+                            <button type="submit" class="btn btn-primary btn-full">
+                                تأكيد الطلب
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>الشامل</h3>
+                    <p>منصة إلكترونية متكاملة لقطع غيار السيارات في عرعر - المملكة العربية السعودية</p>
+                </div>
+                <div class="footer-section">
+                    <h4>روابط سريعة</h4>
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                        <li><a href="{{ url_for('search') }}">البحث</a></li>
+                        <li><a href="{{ url_for('orders') }}">الطلبات</a></li>
+                        <li><a href="{{ url_for('admin') }}">تسجيل الدخول</a></li>
+                        <li><a href="{{ url_for('customer_dashboard') }}">لوحة التحكم</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // تحميل عناصر السلة عند بدء الصفحة
+        document.addEventListener('DOMContentLoaded', function () {
+            loadCartItems();
+        });
+
+        // إظهار/إخفاء نموذج البطاقة
+        function toggleCardForm() {
+            const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+            const cardForm = document.getElementById('cardPaymentForm');
+            const cardInputs = cardForm.querySelectorAll('input');
+
+            if (paymentMethod === 'mada' || paymentMethod === 'visa') {
+                cardForm.style.display = 'block';
+                // جعل الحقول مطلوبة
+                cardInputs.forEach(input => input.setAttribute('required', 'required'));
+            } else {
+                cardForm.style.display = 'none';
+                // إزالة خاصية required
+                cardInputs.forEach(input => input.removeAttribute('required'));
+            }
+        }
+
+        // تنسيق رقم البطاقة
+        function formatCardNumber(input) {
+            let value = input.value.replace(/\s/g, '').replace(/[^0-9]/g, '');
+            let formattedValue = '';
+
+            for (let i = 0; i < value.length && i < 16; i++) {
+                if (i > 0 && i % 4 === 0) {
+                    formattedValue += ' ';
+                }
+                formattedValue += value[i];
+            }
+
+            input.value = formattedValue;
+        }
+
+        // تنسيق تاريخ الانتهاء
+        function formatExpiry(input) {
+            let value = input.value.replace(/\//g, '').replace(/[^0-9]/g, '');
+
+            if (value.length >= 2) {
+                input.value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            } else {
+                input.value = value;
+            }
+        }
+
+        function loadCartItems() {
+            const cart = JSON.parse(localStorage.getItem('alshamel_cart')) || [];
+            const summaryItems = document.getElementById('summaryItems');
+            const subtotalElement = document.getElementById('subtotal');
+            const totalAmountElement = document.getElementById('totalAmount');
+
+            let subtotal = 0;
+
+            if (cart.length === 0) {
+                summaryItems.innerHTML = '<p>السلة فارغة</p>';
+                subtotalElement.textContent = '0.00 ريال';
+                totalAmountElement.textContent = '0.00 ريال';
+                return;
+            }
+
+            summaryItems.innerHTML = '';
+
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                subtotal += itemTotal;
+
+                const itemElement = document.createElement('div');
+                itemElement.className = 'summary-item';
+                itemElement.innerHTML = `
+                    <div class="item-info">
+                        <h4>${item.name}</h4>
+                        <p>المورد: ${item.supplier}</p>
+                    </div>
+                    <div class="item-details">
+                        <span class="quantity">${item.quantity} × ${item.price} ريال</span>
+                        <span class="item-total">${itemTotal.toFixed(2)} ريال</span>
+                    </div>
+                `;
+                summaryItems.appendChild(itemElement);
+            });
+
+            subtotalElement.textContent = subtotal.toFixed(2) + ' ريال';
+            totalAmountElement.textContent = subtotal.toFixed(2) + ' ريال';
+        }
+
+        // معالجة إرسال النموذج
+        document.getElementById('checkoutForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const cart = JSON.parse(localStorage.getItem('alshamel_cart')) || [];
+
+            if (cart.length === 0) {
+                alert('السلة فارغة');
+                return;
+            }
+
+            formData.append('order_data', JSON.stringify(cart));
+            formData.append('total_amount', document.getElementById('totalAmount').textContent.replace(' ريال', ''));
+
+            // إظهار مؤشر التحميل
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = 'جاري المعالجة...';
+            submitBtn.disabled = true;
+
+            // إرسال الطلب
+            fetch('/process_payment', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // مسح السلة
+                        localStorage.removeItem('alshamel_cart');
+
+                        // توجيه إلى صفحة الشكر
+                        if (data.redirect_url) {
+                            window.location.href = data.redirect_url;
+                        } else {
+                            window.location.href = `/thank_you/${data.order_id}`;
+                        }
+                    } else {
+                        alert(data.message || 'حدث خطأ في معالجة الطلب');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('حدث خطأ في الاتصال');
+                })
+                .finally(() => {
+                    // إعادة تعيين الزر
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                });
+        });
+    </script>
+</body>
+
+</html>

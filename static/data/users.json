@@ -1,0 +1,22 @@
+{
+  "admin": {
+    "username": "admin",
+    "password": "admin123",
+    "role": "admin",
+    "name": "مدير النظام"
+  },
+  "alwakeel": {
+    "username": "alwakeel",
+    "password": "alwakeel123",
+    "role": "supplier",
+    "name": "الوكيل الأصلي",
+    "supplier_id": "alwakeel"
+  },
+  "alhajar": {
+    "username": "alhajar",
+    "password": "alhajar123",
+    "role": "supplier",
+    "name": "الحجر",
+    "supplier_id": "alhajar"
+  }
+}

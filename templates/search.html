@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>البحث - الشامل</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fa-solid fa-car"></i>
+                    <h1>الشامل</h1>
+                </div>
+                <nav class="nav">
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                        <li><a href="{{ url_for('search') }}" class="active">البحث</a></li>
+                        <li><a href="{{ url_for('orders') }}">الطلبات</a></li>
+                        <li><a href="{{ url_for('admin') }}">تسجيل الدخول</a></li>
+                        <li><a href="{{ url_for('customer_dashboard') }}">لوحة التحكم</a></li>
+                    </ul>
+                </nav>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" onclick="openCart()"
+                        style="position: relative; margin-left: 10px;">
+                        <i class="fa-solid fa-shopping-cart"></i> السلة
+                        <span class="cart-count" id="cartCount" style="display: none; position: absolute; top: -8px; right: -8px; background: var(--error-color); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold;">0</span>
+                    </button>
+                    <a href="{{ url_for('index') }}" class="btn btn-secondary"><i class="fa-solid fa-home"></i>
+                        الرئيسية</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Search Section -->
+    <section class="search-section">
+        <div class="container">
+            <div class="search-header">
+                <h2>البحث في قطع الغيار</h2>
+                <p>ابحث عن قطع الغيار باستخدام رقم الهيكل، رقم الموديل، رقم القطعة، أو اسم القطعة</p>
+            </div>
+
+            <div class="search-form-container">
+                <form action="{{ url_for('search') }}" method="GET" class="search-form">
+                    <div class="search-input-group">
+                        <input type="text" name="q" value="{{ query }}" placeholder="ابحث هنا...">
+                        <select name="type">
+                            <option value="all" {% if search_type=='all' %}selected{% endif %}>جميع الأنواع</option>
+                            <option value="name" {% if search_type=='name' %}selected{% endif %}>اسم القطعة</option>
+                            <option value="part_number" {% if search_type=='part_number' %}selected{% endif %}>رقم
+                                القطعة</option>
+                            <option value="vin" {% if search_type=='vin' %}selected{% endif %}>رقم الهيكل</option>
+                            <option value="model" {% if search_type=='model' %}selected{% endif %}>الموديل</option>
+                        </select>
+                        <button type="submit" class="btn btn-primary">
+                            بحث
+                        </button>
+                    </div>
+                    
+                    <!-- فلاتر البحث -->
+                    <div class="filters-container" style="margin-top: 1.5rem; padding: 1.5rem; background: rgba(255, 255, 255, 0.05); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                        <h4 style="margin-bottom: 1rem; color: var(--text-primary);">فلاتر البحث</h4>
+                        <div class="filters-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                            <div class="filter-group">
+                                <label for="category" style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">الفئة</label>
+                                <select name="category" id="category" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.1); color: var(--text-primary);">
+                                    <option value="">جميع الفئات</option>
+                                    {% for cat in categories %}
+                                    <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>{{ cat }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="filter-group">
+                                <label for="supplier" style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">المورد</label>
+                                <select name="supplier" id="supplier" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.1); color: var(--text-primary);">
+                                    <option value="">جميع الموردين</option>
+                                    {% for supp_name, supp_data in suppliers.items() %}
+                                    <option value="{{ supp_name }}" {% if selected_supplier == supp_name %}selected{% endif %}>{{ supp_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="filter-group">
+                                <label for="brand" style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">العلامة التجارية</label>
+                                <select name="brand" id="brand" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.1); color: var(--text-primary);">
+                                    <option value="">جميع العلامات</option>
+                                    {% for br in brands %}
+                                    <option value="{{ br }}" {% if selected_brand == br %}selected{% endif %}>{{ br }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="filter-group">
+                                <label for="min_price" style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">السعر الأدنى (ريال)</label>
+                                <input type="number" name="min_price" id="min_price" value="{{ min_price }}" placeholder="0" min="0" step="0.01" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.1); color: var(--text-primary);">
+                            </div>
+                            
+                            <div class="filter-group">
+                                <label for="max_price" style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">السعر الأعلى (ريال)</label>
+                                <input type="number" name="max_price" id="max_price" value="{{ max_price }}" placeholder="999999" min="0" step="0.01" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.1); color: var(--text-primary);">
+                            </div>
+                            
+                            <div class="filter-group">
+                                <label for="sort" style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">ترتيب حسب</label>
+                                <select name="sort" id="sort" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.1); color: var(--text-primary);">
+                                    <option value="price_asc" {% if sort_by == 'price_asc' %}selected{% endif %}>السعر: من الأقل إلى الأعلى</option>
+                                    <option value="price_desc" {% if sort_by == 'price_desc' %}selected{% endif %}>السعر: من الأعلى إلى الأقل</option>
+                                    <option value="name_asc" {% if sort_by == 'name_asc' %}selected{% endif %}>الاسم: أ-ي</option>
+                                    <option value="name_desc" {% if sort_by == 'name_desc' %}selected{% endif %}>الاسم: ي-أ</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Search Tips -->
+            <div class="search-tips">
+                <h3>نصائح البحث:</h3>
+                <ul>
+                    <li>استخدم رقم الهيكل (VIN) للحصول على نتائج دقيقة</li>
+                    <li>يمكنك البحث باسم القطعة جزئياً</li>
+                    <li>استخدم رقم القطعة للبحث المباشر</li>
+                    <li>ابحث بالموديل للعثور على جميع القطع المتوافقة</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Section -->
+    <section class="results-section">
+        <div class="container">
+            {% if query or selected_category or selected_supplier or selected_brand or min_price or max_price %}
+            <div class="results-header">
+                <h3>{% if query %}نتائج البحث عن "{{ query }}"{% else %}نتائج البحث{% endif %}</h3>
+                <div class="results-count">
+                    <span>{{ products|length }} نتيجة</span>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if products %}
+            <div class="results-grid">
+                {% for product in products %}
+                <div class="product-card">
+                    <div class="product-image">
+                    </div>
+                    <div class="product-info">
+                        <h4>{{ product.name }}</h4>
+                        <p class="product-part-number">رقم القطعة: {{ product.part_number }}</p>
+                        <p class="product-brand">{{ product.brand }} - {{ product.type }}</p>
+                        <p class="product-category">{{ product.category }}</p>
+
+                        <div class="product-compatibility">
+                            <h5>متوافق مع:</h5>
+                            <div class="compatibility-tags">
+                                {% for model in product.model_compatible[:3] %}
+                                <span class="tag">{{ model }}</span>
+                                {% endfor %}
+                                {% if product.model_compatible|length > 3 %}
+                                <span class="tag">+{{ product.model_compatible|length - 3 }} أكثر</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="product-price">
+                            <span class="current-price">{{ product.price }} ريال</span>
+                            {% if product.original_price > product.price %}
+                            <span class="original-price">{{ product.original_price }} ريال</span>
+                            <span class="discount">خصم {{ ((product.original_price - product.price) /
+                                product.original_price * 100)|round }}%</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="product-supplier">
+                            {{ product.supplier }}
+                            {% if suppliers[product.supplier] %}
+                            <span class="supplier-rating">
+                                {% for i in range(5) %}
+                                <i
+                                    class="fa-solid fa-star {% if i < suppliers[product.supplier].rating %}filled{% endif %}"></i>
+                                {% endfor %}
+                            </span>
+                            {% endif %}
+                        </div>
+
+                        <div class="product-stock">
+                            {% if product.stock > 0 %}
+                            <span class="in-stock">
+                                متوفر ({{ product.stock }} قطعة)
+                            </span>
+                            {% else %}
+                            <span class="out-of-stock">
+                                غير متوفر
+                            </span>
+                            {% endif %}
+                        </div>
+
+                        <div class="product-actions">
+                            <button class="btn btn-primary" onclick="viewProduct('{{ product.id }}')">
+                                عرض التفاصيل
+                            </button>
+                            {% if product.stock > 0 %}
+                            <button class="btn btn-secondary" onclick="addToCart('{{ product.id }}')"><i
+                                    class="fa-solid fa-cart-plus"></i> إضافة للسلة</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Price Comparison -->
+            {% if products|length > 1 %}
+            <div class="price-comparison">
+                <h3>مقارنة الأسعار</h3>
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>المنتج</th>
+                                <th>المورد</th>
+                                <th>السعر</th>
+                                <th>النوع</th>
+                                <th>الإجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in products[:5] %}
+                            <tr>
+                                <td>{{ product.name }}</td>
+                                <td>{{ product.supplier }}</td>
+                                <td class="price">{{ product.price }} ريال</td>
+                                <td>
+                                    <span
+                                        class="type-badge {% if product.type == 'أصلية' %}original{% else %}commercial{% endif %}">
+                                        {{ product.type }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary" onclick="viewProduct('{{ product.id }}')"><i
+                                            class="fa-solid fa-eye"></i> عرض</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            {% elif query %}
+            <div class="no-results">
+                <h3>لم يتم العثور على نتائج</h3>
+                <p>لم نتمكن من العثور على منتجات تطابق بحثك "{{ query }}"</p>
+                <div class="suggestions">
+                    <h4>اقتراحات:</h4>
+                    <ul>
+                        <li>تأكد من صحة الإملاء</li>
+                        <li>جرب كلمات بحث مختلفة</li>
+                        <li>استخدم مصطلحات أكثر عمومية</li>
+                        <li>تحقق من رقم الهيكل أو رقم القطعة</li>
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>الشامل</h3>
+                    <p>منصة إلكترونية متكاملة لقطع غيار السيارات في عرعر - المملكة العربية السعودية</p>
+                </div>
+                <div class="footer-section">
+                    <h4>روابط سريعة</h4>
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                        <li><a href="{{ url_for('search') }}">البحث</a></li>
+                        <li><a href="{{ url_for('orders') }}">الطلبات</a></li>
+                        <li><a href="{{ url_for('admin') }}">تسجيل الدخول</a></li>
+                        <li><a href="{{ url_for('customer_dashboard') }}">لوحة التحكم</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Cart Modal -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeCart()">&times;</span>
+            <h2>سلة المشتريات</h2>
+            <div id="cartItems" class="cart-items">
+                <!-- سيتم إضافة العناصر هنا -->
+            </div>
+            <div class="cart-summary">
+                <div class="cart-total">
+                    <span>المجموع:</span>
+                    <span id="cartTotal">0.00 ريال</span>
+                </div>
+                <div class="cart-actions">
+                    <button class="btn btn-danger" onclick="clearCart()">
+                        مسح السلة
+                    </button>
+                    <button class="btn btn-primary" onclick="goToCheckout()">
+                        إتمام الشراء
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>

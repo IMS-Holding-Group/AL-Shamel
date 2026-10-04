@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.name }} - الشامل</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fa-solid fa-car"></i>
+                    <h1>الشامل</h1>
+                </div>
+                <nav class="nav">
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                        <li><a href="{{ url_for('search') }}">البحث</a></li>
+                        <li><a href="{{ url_for('orders') }}">الطلبات</a></li>
+                        <li><a href="{{ url_for('admin') }}">تسجيل الدخول</a></li>
+                        <li><a href="{{ url_for('customer_dashboard') }}">لوحة التحكم</a></li>
+                    </ul>
+                </nav>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" onclick="openCart()"
+                        style="position: relative; margin-left: 10px;">
+                        <i class="fa-solid fa-shopping-cart"></i> السلة
+                        <span class="cart-count" id="cartCount" style="display: none; position: absolute; top: -8px; right: -8px; background: var(--error-color); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold;">0</span>
+                    </button>
+                    <a href="{{ url_for('index') }}" class="btn btn-secondary"><i class="fa-solid fa-home"></i>
+                        الرئيسية</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Product Detail Section -->
+    <section class="product-detail-section">
+        <div class="container">
+            <div class="product-detail-content">
+                <div class="product-images">
+                    <div class="main-image">
+                    </div>
+                </div>
+
+                <div class="product-info">
+                    <h1>{{ product.name }}</h1>
+                    <p class="product-part-number">رقم القطعة: {{ product.part_number }}</p>
+                    <p class="product-brand">{{ product.brand }} - {{ product.type }}</p>
+                    <p class="product-category">الفئة: {{ product.category }}</p>
+
+                    <div class="product-price">
+                        <span class="current-price">{{ product.price }} ريال</span>
+                        {% if product.original_price > product.price %}
+                        <span class="original-price">{{ product.original_price }} ريال</span>
+                        <span class="discount">خصم {{ ((product.original_price - product.price) / product.original_price
+                            * 100)|round }}%</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="product-supplier">
+                        {{ product.supplier }}
+                        {% if supplier %}
+                        <span class="supplier-rating">
+                            {% for i in range(5) %}
+                            {% endfor %}
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    <div class="product-stock">
+                        {% if product.stock > 0 %}
+                        <span class="in-stock">
+                            متوفر ({{ product.stock }} قطعة)
+                        </span>
+                        {% else %}
+                        <span class="out-of-stock">
+                            غير متوفر
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    <div class="product-description">
+                        <h3>الوصف</h3>
+                        <p>{{ product.description }}</p>
+                    </div>
+
+                    <div class="product-specifications">
+                        <h3>المواصفات</h3>
+                        <div class="specs-grid">
+                            <div class="spec-item">
+                                <span class="spec-label">الضمان:</span>
+                                <span class="spec-value">{{ product.warranty }}</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label">الوزن:</span>
+                                <span class="spec-value">{{ product.weight }}</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label">الأبعاد:</span>
+                                <span class="spec-value">{{ product.dimensions }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="product-compatibility">
+                        <h3>متوافق مع</h3>
+                        <div class="compatibility-section">
+                            <h4>أرقام الهيكل:</h4>
+                            <div class="compatibility-tags">
+                                {% for vin in product.vin_compatible %}
+                                <span class="tag">{{ vin }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="compatibility-section">
+                            <h4>الموديلات:</h4>
+                            <div class="compatibility-tags">
+                                {% for model in product.model_compatible %}
+                                <span class="tag">{{ model }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="product-actions">
+                        <div class="quantity-selector">
+                            <label for="quantity">الكمية:</label>
+                            <input type="number" id="quantity" name="quantity" value="1" min="1"
+                                max="{{ product.stock }}">
+                        </div>
+                        <div class="action-buttons">
+                            {% if product.stock > 0 %}
+                            <button class="btn btn-primary"
+                                onclick="addToCart('{{ product.id }}', parseInt(document.getElementById('quantity').value) || 1)"><i
+                                    class="fa-solid fa-cart-plus"></i> إضافة للسلة</button>
+                            <button class="btn btn-secondary" onclick="buyNow('{{ product.id }}')">
+                                شراء مباشر
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Similar Products -->
+            {% if similar_products %}
+            <div class="similar-products">
+                <h2 style="margin-bottom: 2rem;">منتجات مشابهة</h2>
+                <div class="products-grid">
+                    {% for similar_product in similar_products %}
+                    <div class="product-card">
+                        <div class="product-image">
+                        </div>
+                        <div class="product-info">
+                            <h3>{{ similar_product.name }}</h3>
+                            <p class="product-part-number">{{ similar_product.part_number }}</p>
+                            <p class="product-brand">{{ similar_product.brand }} - {{ similar_product.type }}</p>
+                            <div class="product-price">
+                                <span class="current-price">{{ similar_product.price }} ريال</span>
+                            </div>
+                            <div class="product-supplier">
+                                {{ similar_product.supplier }}
+                            </div>
+                            <div class="product-actions">
+                                <button class="btn btn-primary" onclick="viewProduct('{{ similar_product.id }}')">
+                                    عرض التفاصيل
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>الشامل</h3>
+                    <p>منصة إلكترونية متكاملة لقطع غيار السيارات في عرعر - المملكة العربية السعودية</p>
+                </div>
+                <div class="footer-section">
+                    <h4>روابط سريعة</h4>
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                        <li><a href="{{ url_for('search') }}">البحث</a></li>
+                        <li><a href="{{ url_for('orders') }}">الطلبات</a></li>
+                        <li><a href="{{ url_for('admin') }}">تسجيل الدخول</a></li>
+                        <li><a href="{{ url_for('customer_dashboard') }}">لوحة التحكم</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // ربط زر الشراء المباشر
+        document.addEventListener('DOMContentLoaded', function () {
+            const buyNowBtn = document.querySelector('.btn-buy-now');
+            if (buyNowBtn) {
+                buyNowBtn.addEventListener('click', function () {
+                    const productId = '{{ product.id }}';
+                    buyNow(productId);
+                });
+            }
+        });
+    </script>
+
+    <!-- Cart Modal -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeCart()">&times;</span>
+            <h2>سلة المشتريات</h2>
+            <div id="cartItems" class="cart-items">
+                <!-- سيتم إضافة العناصر هنا -->
+            </div>
+            <div class="cart-summary">
+                <div class="cart-total">
+                    <span>المجموع:</span>
+                    <span id="cartTotal">0.00 ريال</span>
+                </div>
+                <div class="cart-actions">
+                    <button class="btn btn-danger" onclick="clearCart()">
+                        مسح السلة
+                    </button>
+                    <button class="btn btn-primary" onclick="goToCheckout()">
+                        إتمام الشراء
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

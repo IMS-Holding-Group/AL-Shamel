@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الشامل - منصة قطع غيار السيارات</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fa-solid fa-car"></i>
+                    <h1>الشامل</h1>
+                </div>
+                <nav class="nav">
+                    <ul>
+                        <li><a href="{{ url_for('index') }}" class="active"><i class="fa-solid fa-home"></i>
+                                الرئيسية</a></li>
+                        <li><a href="{{ url_for('search') }}"><i class="fa-solid fa-search"></i> البحث</a></li>
+                        <li><a href="{{ url_for('orders') }}"><i class="fa-solid fa-shopping-bag"></i> الطلبات</a></li>
+                        <li><a href="{{ url_for('admin') }}"><i class="fa-solid fa-sign-in-alt"></i> تسجيل الدخول</a>
+                        </li>
+                        <li><a href="{{ url_for('customer_dashboard') }}"><i class="fa-solid fa-user"></i> الملف
+                                الشخصي</a></li>
+                    </ul>
+                </nav>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" onclick="openCart()"
+                        style="position: relative; margin-left: 10px;">
+                        <i class="fa-solid fa-shopping-cart"></i> السلة
+                        <span class="cart-count" id="cartCount" style="display: none;">0</span>
+                    </button>
+                    <button class="btn btn-primary" onclick="openSearchModal()">
+                        <i class="fa-solid fa-search"></i> بحث سريع
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h2>الشامل - منصة قطع غيار السيارات في عرعر</h2>
+                <p>ابحث عن قطع الغيار الأصلية والتجارية من أفضل الموردين المعتمدين</p>
+                <div class="hero-search">
+                    <form action="{{ url_for('search') }}" method="GET" class="search-form">
+                        <div class="search-input-group">
+                            <input type="text" name="q" placeholder="ابحث برقم القطعة، الموديل، أو اسم القطعة..."
+                                required>
+                            <select name="type">
+                                <option value="all">جميع الأنواع</option>
+                                <option value="name">اسم القطعة</option>
+                                <option value="part_number">رقم القطعة</option>
+                                <option value="vin">رقم الهيكل</option>
+                                <option value="model">الموديل</option>
+                            </select>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa-solid fa-search"></i> بحث
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="hero-features">
+                    <div class="feature">
+                        <i class="fa-solid fa-shipping-fast" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+                        <span>شحن سريع</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fa-solid fa-certificate" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+                        <span>ضمان الجودة</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fa-solid fa-shield-alt" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+                        <span>دفع آمن</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fa-solid fa-headset" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+                        <span>دعم 24/7</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Suppliers Section -->
+    <section class="suppliers">
+        <div class="container">
+            <h2 class="section-title"><i class="fa-solid fa-handshake"></i> شركاؤنا المعتمدون</h2>
+            <div class="suppliers-grid">
+                {% for supplier_id, supplier in suppliers.items() %}
+                <div class="supplier-card">
+                    <div class="supplier-logo">
+                    </div>
+                    <h3>{{ supplier.name }}</h3>
+                    <p class="supplier-type">{{ supplier.type }}</p>
+                    <div class="supplier-info">
+                        <p>{{ supplier.location }}</p>
+                        <p>{{ supplier.phone }}</p>
+                        <div class="rating">
+                            <span class="stars">
+                                {% for i in range(5) %}
+                                {% endfor %}
+                            </span>
+                            <span class="rating-text">{{ supplier.rating }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Latest Products -->
+    <section class="latest-products">
+        <div class="container">
+            <h2 class="section-title"><i class="fa-solid fa-box-open"></i> أحدث المنتجات</h2>
+            <div class="products-grid">
+                {% for product in latest_products %}
+                <div class="product-card">
+                    <div class="product-image">
+                    </div>
+                    <div class="product-info">
+                        <h3>{{ product.name }}</h3>
+                        <p class="product-part-number">{{ product.part_number }}</p>
+                        <p class="product-brand">{{ product.brand }} - {{ product.type }}</p>
+                        <div class="product-price">
+                            <span class="current-price">{{ product.price }} ريال</span>
+                            {% if product.original_price > product.price %}
+                            <span class="original-price">{{ product.original_price }} ريال</span>
+                            {% endif %}
+                        </div>
+                        <div class="product-supplier">
+                            {{ product.supplier }}
+                        </div>
+                        <div class="product-actions">
+                            <button class="btn btn-primary" onclick="viewProduct('{{ product.id }}')">
+                                عرض التفاصيل
+                            </button>
+                            <button class="btn btn-secondary" onclick="addToCart('{{ product.id }}')"><i
+                                    class="fa-solid fa-cart-plus"></i> إضافة للسلة</button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Cheapest Product Section -->
+    <section class="cheapest-section">
+        <div class="container">
+            <h2 class="section-title">ابحث عن أرخص سلعة</h2>
+            <div class="cheapest-search">
+                <form class="search-form" onsubmit="searchCheapest(event)">
+                    <div class="search-input-group">
+                        <input type="text" id="cheapest-search-input" placeholder="ابحث عن القطعة..." required>
+                        <button type="submit" class="btn btn-primary">
+                            ابحث عن الأرخص
+                        </button>
+                    </div>
+                </form>
+                <div id="cheapest-results" class="cheapest-results"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>الشامل</h3>
+                    <p>منصة إلكترونية متكاملة لقطع غيار السيارات في عرعر - المملكة العربية السعودية</p>
+                </div>
+                <div class="footer-section">
+                    <h4>روابط سريعة</h4>
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                        <li><a href="{{ url_for('search') }}">البحث</a></li>
+                        <li><a href="{{ url_for('orders') }}">الطلبات</a></li>
+                        <li><a href="{{ url_for('admin') }}">تسجيل الدخول</a></li>
+                        <li><a href="{{ url_for('customer_dashboard') }}">لوحة التحكم</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>تواصل معنا</h4>
+                    <p>016-324-5678</p>
+                    <p>info@alshamel.com</p>
+                    <p>عرعر - المملكة العربية السعودية</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 الشامل. جميع الحقوق محفوظة.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Search Modal -->
+    <div id="searchModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeSearchModal()">&times;</span>
+            <h2>بحث سريع</h2>
+            <form action="{{ url_for('search') }}" method="GET">
+                <div class="form-group">
+                    <input type="text" name="q" placeholder="ابحث هنا..." required>
+                </div>
+                <div class="form-group">
+                    <select name="type">
+                        <option value="all">جميع الأنواع</option>
+                        <option value="name">اسم القطعة</option>
+                        <option value="part_number">رقم القطعة</option>
+                        <option value="vin">رقم الهيكل</option>
+                        <option value="model">الموديل</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">بحث</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeCart()">&times;</span>
+            <h2>سلة المشتريات</h2>
+            <div id="cartItems" class="cart-items">
+                <!-- سيتم إضافة العناصر هنا -->
+            </div>
+            <div class="cart-summary">
+                <div class="cart-total">
+                    <span>المجموع:</span>
+                    <span id="cartTotal">0.00 ريال</span>
+                </div>
+                <div class="cart-actions">
+                    <button class="btn btn-danger" onclick="clearCart()">
+                        مسح السلة
+                    </button>
+                    <button class="btn btn-primary" onclick="goToCheckout()">
+                        إتمام الشراء
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>

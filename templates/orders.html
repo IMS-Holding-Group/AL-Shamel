@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الطلبات - الشامل</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fa-solid fa-car"></i>
+                    <h1>الشامل</h1>
+                </div>
+                <nav class="nav">
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                        <li><a href="{{ url_for('search') }}">البحث</a></li>
+                        <li><a href="{{ url_for('orders') }}" class="active">الطلبات</a></li>
+                        <li><a href="{{ url_for('admin') }}">تسجيل الدخول</a></li>
+                        <li><a href="{{ url_for('customer_dashboard') }}">لوحة التحكم</a></li>
+                    </ul>
+                </nav>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" onclick="openCart()"
+                        style="position: relative; margin-left: 10px;">
+                        <i class="fa-solid fa-shopping-cart"></i> السلة
+                        <span class="cart-count" id="cartCount" style="display: none; position: absolute; top: -8px; right: -8px; background: var(--error-color); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold;">0</span>
+                    </button>
+                    <a href="{{ url_for('index') }}" class="btn btn-secondary"><i class="fa-solid fa-home"></i>
+                        الرئيسية</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Orders Section -->
+    <section class="orders-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>الطلبات</h2>
+                <p>عرض ومتابعة جميع الطلبات</p>
+            </div>
+
+            <!-- Order Search -->
+            <div class="order-search">
+                <form class="search-form" onsubmit="searchOrder(event)">
+                    <div class="search-input-group">
+                        <input type="text" id="orderSearchInput" placeholder="ابحث برقم الطلب..." required>
+                        <button type="submit" class="btn btn-primary">
+                            بحث
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Orders List -->
+            <div class="orders-list">
+                {% if orders %}
+                {% for order in orders %}
+                <div class="order-card">
+                    <div class="order-header">
+                        <div class="order-info">
+                            <h3>طلب رقم: {{ order.id }}</h3>
+                            <p class="order-date">
+                                {{ order.created_at[:10] }}
+                            </p>
+                        </div>
+                        <div class="order-status">
+                            <span class="status-badge status-{{ order.status }}">
+                                {% if order.status == 'pending_payment' %}
+                                في انتظار الدفع
+                                {% elif order.status == 'paid' %}
+                                تم الدفع
+                                {% elif order.status == 'shipped' %}
+                                قيد الشحن
+                                {% elif order.status == 'delivered' %}
+                                تم التوصيل
+                                {% elif order.status == 'received' %}
+                                تم الاستلام
+                                {% elif order.status == 'returned' %}
+                                تم الإرجاع
+                                {% elif order.status == 'cancelled' %}
+                                ملغي
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="order-details">
+                        <div class="customer-info">
+                            <h4>معلومات العميل</h4>
+                            <p><strong>الاسم:</strong> {{ order.customer_name }}</p>
+                            <p><strong>الهاتف:</strong> {{ order.customer_phone }}</p>
+                            <p><strong>البريد الإلكتروني:</strong> {{ order.customer_email }}</p>
+                            <p><strong>العنوان:</strong> {{ order.address }}</p>
+                        </div>
+
+                        <div class="payment-info">
+                            <h4>معلومات الدفع</h4>
+                            <p><strong>طريقة الدفع:</strong>
+                                {% if order.payment_method == 'tabby' %}
+                                تابي
+                                {% elif order.payment_method == 'tamara' %}
+                                تمارا
+                                {% elif order.payment_method == 'electronic' %}
+                                الدفع الإلكتروني
+                                {% elif order.payment_method == 'cash_on_delivery' %}
+                                الدفع عند الاستلام
+                                {% endif %}
+                            </p>
+                            <p><strong>المبلغ الإجمالي:</strong> {{ order.total_amount }} ريال</p>
+                        </div>
+                    </div>
+
+                    <div class="order-items">
+                        <h4>المنتجات المطلوبة</h4>
+                        <div class="items-list">
+                            {% for item in order['items'] %}
+                            <div class="item">
+                                <div class="item-info">
+                                    <h5>{{ item.product_name }}</h5>
+                                    <p>المورد: {{ item.supplier }}</p>
+                                </div>
+                                <div class="item-details">
+                                    <span class="quantity">الكمية: {{ item.quantity }}</span>
+                                    <span class="price">{{ item.price }} ريال</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="order-actions">
+                        <button class="btn btn-primary" onclick="trackOrder('{{ order.id }}')"><i
+                                class="fa-solid fa-map-marker-alt"></i> تتبع الطلب</button>
+                        <button class="btn btn-secondary" onclick="viewOrderDetails('{{ order.id }}')">
+                            عرض التفاصيل
+                        </button>
+                        {% if order.status == 'pending_payment' %}
+                        <button class="btn btn-warning" onclick="cancelOrder('{{ order.id }}')">
+                            إلغاء الطلب
+                        </button>
+                        {% endif %}
+                        {% if order.status in ['paid', 'shipped', 'delivered', 'received'] %}
+                        <div style="margin-top: 0.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            {% for item in order['items'] %}
+                            <button class="btn btn-sm btn-info" onclick="showReplacementModal('{{ order.id }}', '{{ item.id }}', '{{ item.product_id }}')" style="font-size: 0.875rem; padding: 0.5rem 1rem;">
+                                <i class="fa-solid fa-exchange-alt"></i> استبدال {{ item.product_name }}
+                            </button>
+                            <button class="btn btn-sm btn-warning" onclick="showReturnModal('{{ order.id }}', '{{ item.id }}')" style="font-size: 0.875rem; padding: 0.5rem 1rem;">
+                                <i class="fa-solid fa-undo"></i> استرجاع {{ item.product_name }}
+                            </button>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="no-orders">
+                    <h3>لا توجد طلبات</h3>
+                    <p>لم يتم العثور على أي طلبات حتى الآن</p>
+                    <a href="{{ url_for('search') }}" class="btn btn-primary">
+                        ابحث عن قطع الغيار
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Order Tracking Modal -->
+    <div id="trackingModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeTrackingModal()">&times;</span>
+            <h2>تتبع الطلب</h2>
+            <div id="trackingContent">
+                <!-- سيتم تحميل محتوى التتبع هنا -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Details Modal -->
+    <div id="orderDetailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeOrderDetailsModal()">&times;</span>
+            <h2>تفاصيل الطلب</h2>
+            <div id="orderDetailsContent">
+                <!-- سيتم تحميل تفاصيل الطلب هنا -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>الشامل</h3>
+                    <p>منصة إلكترونية متكاملة لقطع غيار السيارات في عرعر - المملكة العربية السعودية</p>
+                </div>
+                <div class="footer-section">
+                    <h4>روابط سريعة</h4>
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                        <li><a href="{{ url_for('search') }}">البحث</a></li>
+                        <li><a href="{{ url_for('orders') }}">الطلبات</a></li>
+                        <li><a href="{{ url_for('admin') }}">تسجيل الدخول</a></li>
+                        <li><a href="{{ url_for('customer_dashboard') }}">لوحة التحكم</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Cart Modal -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeCart()">&times;</span>
+            <h2>سلة المشتريات</h2>
+            <div id="cartItems" class="cart-items">
+                <!-- سيتم إضافة العناصر هنا -->
+            </div>
+            <div class="cart-summary">
+                <div class="cart-total">
+                    <span>المجموع:</span>
+                    <span id="cartTotal">0.00 ريال</span>
+                </div>
+                <div class="cart-actions">
+                    <button class="btn btn-danger" onclick="clearCart()">
+                        مسح السلة
+                    </button>
+                    <button class="btn btn-primary" onclick="goToCheckout()">
+                        إتمام الشراء
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>

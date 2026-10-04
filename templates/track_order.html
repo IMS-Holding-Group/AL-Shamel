@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تتبع الطلب {{ order.id }} - الشامل</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fa-solid fa-car"></i>
+                    <h1>الشامل</h1>
+                </div>
+                <nav class="nav">
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                        <li><a href="{{ url_for('search') }}">البحث</a></li>
+                        <li><a href="{{ url_for('orders') }}">الطلبات</a></li>
+                        <li><a href="{{ url_for('admin') }}">تسجيل الدخول</a></li>
+                        <li><a href="{{ url_for('customer_dashboard') }}">لوحة التحكم</a></li>
+                    </ul>
+                </nav>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" onclick="openCart()"
+                        style="position: relative; margin-left: 10px;">
+                        <i class="fa-solid fa-shopping-cart"></i> السلة
+                        <span class="cart-count" id="cartCount" style="display: none; position: absolute; top: -8px; right: -8px; background: var(--error-color); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold;">0</span>
+                    </button>
+                    <a href="{{ url_for('orders') }}" class="btn btn-secondary">
+                        جميع الطلبات
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Order Tracking Section -->
+    <section class="tracking-section">
+        <div class="container">
+            <div class="tracking-header">
+                <h2>تتبع الطلب</h2>
+                <p>طلب رقم: <strong>{{ order.id }}</strong></p>
+            </div>
+
+            <div class="order-summary">
+                <div class="summary-card">
+                    <h3>ملخص الطلب</h3>
+                    <div class="summary-details">
+                        <div class="detail-item">
+                            <span class="label">العميل:</span>
+                            <span class="value">{{ order.customer_name }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">الهاتف:</span>
+                            <span class="value">{{ order.customer_phone }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">المبلغ الإجمالي:</span>
+                            <span class="value">{{ order.total_amount }} ريال</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">طريقة الدفع:</span>
+                            <span class="value">
+                                {% if order.payment_method == 'tabby' %}
+                                تابي
+                                {% elif order.payment_method == 'tamara' %}
+                                تمارا
+                                {% elif order.payment_method == 'electronic' %}
+                                الدفع الإلكتروني
+                                {% elif order.payment_method == 'cash_on_delivery' %}
+                                الدفع عند الاستلام
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">تاريخ الطلب:</span>
+                            <span class="value">{{ order.created_at[:10] }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tracking Timeline -->
+            <div class="tracking-timeline">
+                <h3>مسار الطلب</h3>
+                <div class="timeline">
+                    <!-- Payment Step -->
+                    <div class="timeline-item {% if order.status in ['paid', 'shipped', 'delivered', 'received'] %}completed{% else %}pending{% endif %}">
+                        <div class="timeline-icon">
+                        </div>
+                        <div class="timeline-content">
+                            <h4>تم الدفع</h4>
+                            <p>تم تأكيد الدفع بنجاح</p>
+                            {% if order.tracking.paid %}
+                            <span class="timeline-date">{{ order.tracking.paid[:16] }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Preparing Step (جاري التجهيز) -->
+                    {% if order.status == 'paid' %}
+                    <div class="timeline-item in-progress">
+                        <div class="timeline-icon">
+                        </div>
+                        <div class="timeline-content">
+                            <h4>جاري التجهيز</h4>
+                            <p>سيتم تجهيز الطلب قريباً</p>
+                        </div>
+                    </div>
+                    {% elif order.status in ['shipped', 'delivered', 'received'] %}
+                    <div class="timeline-item completed">
+                        <div class="timeline-icon">
+                        </div>
+                        <div class="timeline-content">
+                            <h4>تم التجهيز</h4>
+                            <p>تم تجهيز الطلب بنجاح</p>
+                            {% if order.tracking.preparing %}
+                            <span class="timeline-date">{{ order.tracking.preparing[:16] }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="timeline-item pending">
+                        <div class="timeline-icon">
+                        </div>
+                        <div class="timeline-content">
+                            <h4>جاري التجهيز</h4>
+                            <p>في انتظار التجهيز</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Shipping Step -->
+                    {% if order.status == 'shipped' %}
+                    <div class="timeline-item in-progress">
+                        <div class="timeline-icon">
+                        </div>
+                        <div class="timeline-content">
+                            <h4>قيد الشحن</h4>
+                            <p>جاري التوصيل</p>
+                            {% if order.tracking.shipped %}
+                            <span class="timeline-date">{{ order.tracking.shipped[:16] }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% elif order.status in ['delivered', 'received'] %}
+                    <div class="timeline-item completed">
+                        <div class="timeline-icon">
+                        </div>
+                        <div class="timeline-content">
+                            <h4>قيد الشحن</h4>
+                            <p>تم إرسال الطلب للتوصيل</p>
+                            {% if order.tracking.shipped %}
+                            <span class="timeline-date">{{ order.tracking.shipped[:16] }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="timeline-item pending">
+                        <div class="timeline-icon">
+                        </div>
+                        <div class="timeline-content">
+                            <h4>قيد الشحن</h4>
+                            <p>في انتظار الشحن</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Delivery Step -->
+                    {% if order.status == 'delivered' %}
+                    <div class="timeline-item in-progress">
+                        <div class="timeline-icon">
+                        </div>
+                        <div class="timeline-content">
+                            <h4>تم التوصيل</h4>
+                            <p>جاري الاستلام</p>
+                            {% if order.tracking.delivered %}
+                            <span class="timeline-date">{{ order.tracking.delivered[:16] }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% elif order.status == 'received' %}
+                    <div class="timeline-item completed">
+                        <div class="timeline-icon">
+                        </div>
+                        <div class="timeline-content">
+                            <h4>تم التوصيل</h4>
+                            <p>تم تسليم الطلب بنجاح</p>
+                            {% if order.tracking.delivered %}
+                            <span class="timeline-date">{{ order.tracking.delivered[:16] }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="timeline-item pending">
+                        <div class="timeline-icon">
+                        </div>
+                        <div class="timeline-content">
+                            <h4>تم التوصيل</h4>
+                            <p>في انتظار التوصيل</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Received Step -->
+                    {% if order.status == 'received' %}
+                    <div class="timeline-item completed">
+                        <div class="timeline-icon">
+                        </div>
+                        <div class="timeline-content">
+                            <h4>تم الاستلام</h4>
+                            <p>تم تأكيد استلام الطلب</p>
+                            {% if order.tracking.received %}
+                            <span class="timeline-date">{{ order.tracking.received[:16] }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="timeline-item pending">
+                        <div class="timeline-icon">
+                        </div>
+                        <div class="timeline-content">
+                            <h4>تم الاستلام</h4>
+                            <p>في انتظار الاستلام</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Order Items -->
+            <div class="order-items">
+                <h3>المنتجات المطلوبة</h3>
+                <div class="items-list">
+                    {% for item in order['items'] %}
+                    <div class="item-card">
+                        <div class="item-image">
+                        </div>
+                        <div class="item-details">
+                            <h4>{{ item.product_name }}</h4>
+                            <p>المورد: {{ item.supplier }}</p>
+                            <div class="item-price">
+                                <span class="quantity">الكمية: {{ item.quantity }}</span>
+                                <span class="price">{{ item.price }} ريال</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Delivery Address -->
+            <div class="delivery-address">
+                <h3>عنوان التسليم</h3>
+                <div class="address-card">
+                    <p>{{ order.address }}</p>
+                </div>
+            </div>
+
+            <!-- Order Status -->
+            <div class="order-status">
+                <h3>حالة الطلب الحالية</h3>
+                <div class="status-card">
+                    <span class="status-badge status-{{ order.status }}">
+                        {% if order.status == 'pending_payment' %}
+                        في انتظار الدفع
+                        {% elif order.status == 'paid' %}
+                        تم الدفع
+                        {% elif order.status == 'shipped' %}
+                        قيد الشحن
+                        {% elif order.status == 'delivered' %}
+                        تم التوصيل
+                        {% elif order.status == 'received' %}
+                        تم الاستلام
+                        {% elif order.status == 'returned' %}
+                        تم الإرجاع
+                        {% elif order.status == 'cancelled' %}
+                        ملغي
+                        {% endif %}
+                    </span>
+                    <p class="status-description">
+                        {% if order.status == 'pending_payment' %}
+                        الطلب في انتظار تأكيد الدفع
+                        {% elif order.status == 'paid' %}
+                        تم تأكيد الدفع، سيتم تجهيز الطلب قريباً
+                        {% elif order.status == 'shipped' %}
+                        الطلب في الطريق للتسليم
+                        {% elif order.status == 'delivered' %}
+                        تم تسليم الطلب بنجاح
+                        {% elif order.status == 'received' %}
+                        تم تأكيد استلام الطلب
+                        {% elif order.status == 'returned' %}
+                        تم إرجاع الطلب
+                        {% elif order.status == 'cancelled' %}
+                        تم إلغاء الطلب
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="tracking-actions">
+                <a href="{{ url_for('orders') }}" class="btn btn-primary">
+                    جميع الطلبات
+                </a>
+                <a href="{{ url_for('index') }}" class="btn btn-secondary"><i class="fa-solid fa-home"></i> الرئيسية</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>الشامل</h3>
+                    <p>منصة إلكترونية متكاملة لقطع الشامل السيارات في عرعر - المملكة العربية السعودية</p>
+                </div>
+                <div class="footer-section">
+                    <h4>روابط سريعة</h4>
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                        <li><a href="{{ url_for('search') }}">البحث</a></li>
+                        <li><a href="{{ url_for('orders') }}">الطلبات</a></li>
+                        <li><a href="{{ url_for('admin') }}">تسجيل الدخول</a></li>
+                        <li><a href="{{ url_for('customer_dashboard') }}">لوحة التحكم</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>

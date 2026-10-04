@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل حساب جديد - الشامل</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fa-solid fa-car"></i>
+                    <h1><a href="{{ url_for('index') }}" style="text-decoration: none; color: inherit;">الشامل</a></h1>
+                </div>
+                <nav class="nav">
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                        <li><a href="{{ url_for('search') }}">البحث</a></li>
+                        <li><a href="{{ url_for('orders') }}">الطلبات</a></li>
+                        <li><a href="{{ url_for('admin') }}">تسجيل الدخول</a></li>
+                    </ul>
+                </nav>
+                <div class="header-actions">
+                    <a href="{{ url_for('admin') }}" class="btn btn-secondary"><i class="fa-solid fa-sign-in-alt"></i> تسجيل الدخول</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Register Section -->
+    <section class="admin-section">
+        <div class="container">
+            <div class="admin-login-container" style="max-width: 700px;">
+                <div class="login-card">
+                    <div class="login-header">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <h2>إنشاء حساب جديد</h2>
+                        <p>انضم إلى منصة الشامل لقطع غيار السيارات</p>
+                    </div>
+
+                    <form id="registerForm" class="login-form">
+                        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label for="fullName"><i class="fa-solid fa-user"></i> الاسم الأول</label>
+                                <input type="text" id="fullName" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="secondName"><i class="fa-solid fa-user"></i> الاسم الثاني</label>
+                                <input type="text" id="secondName" name="second_name" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label for="email"><i class="fa-solid fa-envelope"></i> البريد الإلكتروني</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone"><i class="fa-solid fa-phone"></i> رقم الهاتف</label>
+                                <input type="tel" id="phone" name="phone" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label for="password"><i class="fa-solid fa-lock"></i> كلمة المرور</label>
+                                <input type="password" id="password" name="password" required minlength="6">
+                            </div>
+                            <div class="form-group">
+                                <label for="confirmPassword"><i class="fa-solid fa-lock"></i> تأكيد كلمة المرور</label>
+                                <input type="password" id="confirmPassword" name="confirmPassword" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-full">
+                            <i class="fa-solid fa-user-plus"></i> إنشاء الحساب
+                        </button>
+
+                        <div style="text-align: center; margin-top: 1.5rem;">
+                            <p style="color: var(--text-secondary);">
+                                لديك حساب بالفعل؟ 
+                                <a href="{{ url_for('admin') }}" style="color: var(--primary-color); font-weight: 600;">تسجيل الدخول</a>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>الشامل</h3>
+                    <p>منصة إلكترونية متكاملة لقطع غيار السيارات في عرعر - المملكة العربية السعودية</p>
+                </div>
+                <div class="footer-section">
+                    <h4>روابط سريعة</h4>
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                        <li><a href="{{ url_for('search') }}">البحث</a></li>
+                        <li><a href="{{ url_for('orders') }}">الطلبات</a></li>
+                        <li><a href="{{ url_for('admin') }}">الإدارة</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>تواصل معنا</h4>
+                    <p><i class="fa-solid fa-map-marker-alt"></i> عرعر - المملكة العربية السعودية</p>
+                    <p><i class="fa-solid fa-phone"></i> +966 50 123 4567</p>
+                    <p><i class="fa-solid fa-envelope"></i> info@alshamel.com</p>
+                </div>
+                <div class="footer-section">
+                    <h4>تابعنا</h4>
+                    <div class="social-links" style="display: flex; gap: 1rem; margin-top: 1rem;">
+                        <a href="#" style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white;"><i class="fa-brands fa-twitter"></i></a>
+                        <a href="#" style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white;"><i class="fa-brands fa-facebook"></i></a>
+                        <a href="#" style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white;"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white;"><i class="fa-brands fa-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 الشامل. جميع الحقوق محفوظة.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                alert('كلمة المرور غير متطابقة');
+                return;
+            }
+            
+            const formData = new FormData(this);
+            
+            fetch('/register', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('تم إنشاء الحساب بنجاح! يمكنك الآن تسجيل الدخول');
+                    window.location.href = '{{ url_for("admin") }}';
+                } else {
+                    alert(data.message || 'فشل إنشاء الحساب');
+                }
+            })
+            .catch(error => {
+                alert('حدث خطأ في إنشاء الحساب');
+            });
+        });
+    </script>
+</body>
+
+</html>

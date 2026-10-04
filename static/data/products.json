@@ -1,0 +1,95 @@
+{
+  "products": [
+    {
+      "id": "prod_001",
+      "name": "فلتر زيت محرك",
+      "part_number": "FLT-001",
+      "vin_compatible": [
+        "VIN123456",
+        "VIN789012"
+      ],
+      "model_compatible": [
+        "كامري 2020",
+        "كامري 2021",
+        "أفالون 2020"
+      ],
+      "supplier": "الوكيل الأصلي",
+      "price": 45.0,
+      "original_price": 50.0,
+      "type": "أصلية",
+      "brand": "تويوتا",
+      "category": "فلاتر",
+      "stock": 25,
+      "description": "فلتر زيت محرك عالي الجودة من تويوتا",
+      "image": "filter_oil.jpg"
+    },
+    {
+      "id": "prod_002",
+      "name": "مكابح أمامية",
+      "part_number": "BRK-002",
+      "vin_compatible": [
+        "VIN123456",
+        "VIN345678"
+      ],
+      "model_compatible": [
+        "كامري 2020",
+        "كامري 2021"
+      ],
+      "supplier": "الحجر",
+      "price": 180.0,
+      "original_price": 200.0,
+      "type": "أصلية",
+      "brand": "تويوتا",
+      "category": "مكابح",
+      "stock": 15,
+      "description": "مكابح أمامية أصلية من تويوتا",
+      "image": "brakes_front.jpg"
+    },
+    {
+      "id": "prod_003",
+      "name": "فلتر هواء",
+      "part_number": "AIR-003",
+      "vin_compatible": [
+        "VIN789012",
+        "VIN456789"
+      ],
+      "model_compatible": [
+        "أفالون 2020",
+        "أفالون 2021"
+      ],
+      "supplier": "البرادي",
+      "price": 35.0,
+      "original_price": 40.0,
+      "type": "تجارية",
+      "brand": "بوش",
+      "category": "فلاتر",
+      "stock": 40,
+      "description": "فلتر هواء عالي الكفاءة من بوش",
+      "image": "air_filter.jpg"
+    },
+    {
+      "id": "prod_004",
+      "name": "شمعة إشعال",
+      "part_number": "SPK-004",
+      "vin_compatible": [
+        "VIN123456",
+        "VIN789012",
+        "VIN345678"
+      ],
+      "model_compatible": [
+        "كامري 2020",
+        "كامري 2021",
+        "أفالون 2020"
+      ],
+      "supplier": "الناصر",
+      "price": 25.0,
+      "original_price": 30.0,
+      "type": "أصلية",
+      "brand": "تويوتا",
+      "category": "إشعال",
+      "stock": 60,
+      "description": "شمعة إشعال أصلية من تويوتا",
+      "image": "spark_plug.jpg"
+    }
+  ]
+}

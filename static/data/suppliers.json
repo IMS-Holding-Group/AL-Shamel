@@ -1,0 +1,42 @@
+{
+  "الوكيل الأصلي": {
+    "id": "alwakeel",
+    "name": "الوكيل الأصلي",
+    "location": "عرعر - طريق الملك فهد",
+    "phone": "016-324-5678",
+    "email": "info@alwakeel.com",
+    "type": "وكالة رسمية",
+    "rating": 4.8,
+    "logo": "alwakeel.png"
+  },
+  "الحجر": {
+    "id": "alhajar",
+    "name": "الحجر",
+    "location": "عرعر - حي الملك فهد",
+    "phone": "016-325-1234",
+    "email": "sales@alhajar.com",
+    "type": "مورد معتمد",
+    "rating": 4.6,
+    "logo": "alhajar.png"
+  },
+  "البرادي": {
+    "id": "albaradi",
+    "name": "البرادي",
+    "location": "عرعر - شارع الأمير محمد بن عبدالعزيز",
+    "phone": "016-326-7890",
+    "email": "contact@albaradi.com",
+    "type": "مورد معتمد",
+    "rating": 4.7,
+    "logo": "albaradi.png"
+  },
+  "الناصر": {
+    "id": "alnasser",
+    "name": "الناصر",
+    "location": "عرعر - حي النهضة",
+    "phone": "016-327-4567",
+    "email": "info@alnasser.com",
+    "type": "مورد معتمد",
+    "rating": 4.5,
+    "logo": "alnasser.png"
+  }
+}

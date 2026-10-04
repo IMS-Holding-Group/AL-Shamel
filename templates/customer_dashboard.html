@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - الشامل</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fa-solid fa-car"></i>
+                    <h1>الشامل</h1>
+                </div>
+                <nav class="nav">
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                        <li><a href="{{ url_for('search') }}">البحث</a></li>
+                        <li><a href="{{ url_for('orders') }}">الطلبات</a></li>
+                        <li><a href="{{ url_for('customer_dashboard') }}" class="active">لوحة التحكم</a></li>
+                    </ul>
+                </nav>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" onclick="logout()"><i class="fa-solid fa-sign-out-alt"></i> تسجيل
+                        الخروج</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Customer Dashboard -->
+    <section class="admin-section" id="customerSection">
+        <div class="container">
+            <div class="dashboard-header">
+                <h2>لوحة التحكم</h2>
+                <p>مرحباً بك في لوحة تحكمك الشخصية</p>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"
+                        style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+                        <i class="fa-solid fa-shopping-bag" style="font-size: 1.5rem; color: white;"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>إجمالي الطلبات</h3>
+                        <div class="stat-number" id="totalOrdersCount">0</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon"
+                        style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+                        <i class="fa-solid fa-check-circle" style="font-size: 1.5rem; color: white;"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>الطلبات المكتملة</h3>
+                        <div class="stat-number" id="completedOrdersCount">0</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon"
+                        style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+                        <i class="fa-solid fa-truck" style="font-size: 1.5rem; color: white;"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>قيد الشحن</h3>
+                        <div class="stat-number" id="shippingOrdersCount">0</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon"
+                        style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+                        <i class="fa-solid fa-dollar-sign" style="font-size: 1.5rem; color: white;"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>إجمالي المشتريات</h3>
+                        <div class="stat-number" id="totalSpent">0 ريال</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Info Card -->
+            <div class="management-card" style="margin-top: 2rem;">
+                <h3>معلوماتي الشخصية</h3>
+                <div class="customer-info-display" id="customerInfo">
+                    <!-- سيتم تحميل معلومات العميل هنا -->
+                </div>
+                <button class="btn btn-primary" onclick="window.location.href='{{ url_for('profile') }}'">
+                    <i class="fa-solid fa-user-edit"></i> تعديل المعلومات
+                </button>
+            </div>
+
+            <!-- Recent Orders -->
+            <div class="management-card" style="margin-top: 2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3>طلباتي الأخيرة</h3>
+                    <a href="{{ url_for('orders') }}" class="btn btn-secondary">عرض الكل</a>
+                </div>
+                <div id="recentOrdersList" class="orders-list">
+                    <!-- سيتم تحميل الطلبات هنا -->
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="management-card" style="margin-top: 2rem;">
+                <h3>إجراءات سريعة</h3>
+                <div class="quick-actions"
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                    <a href="{{ url_for('search') }}" class="btn btn-primary btn-full">
+                        <i class="fa-solid fa-search"></i> البحث عن قطع الغيار
+                    </a>
+                    <a href="{{ url_for('orders') }}" class="btn btn-secondary btn-full">
+                        <i class="fa-solid fa-shopping-bag"></i> عرض جميع الطلبات
+                    </a>
+                    <a href="{{ url_for('customer_dashboard') }}" class="btn btn-secondary btn-full">
+                        <i class="fa-solid fa-user"></i> الملف الشخصي
+                    </a>
+                    <a href="{{ url_for('index') }}" class="btn btn-secondary btn-full">
+                        <i class="fa-solid fa-home"></i> الصفحة الرئيسية
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>الشامل</h3>
+                    <p>منصة إلكترونية متكاملة لقطع غيار السيارات في عرعر - المملكة العربية السعودية</p>
+                </div>
+                <div class="footer-section">
+                    <h4>روابط سريعة</h4>
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                        <li><a href="{{ url_for('search') }}">البحث</a></li>
+                        <li><a href="{{ url_for('orders') }}">الطلبات</a></li>
+                        <li><a href="{{ url_for('customer_dashboard') }}">لوحة التحكم</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 الشامل. جميع الحقوق محفوظة.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // تحميل بيانات لوحة التحكم عند بدء الصفحة
+        document.addEventListener('DOMContentLoaded', function () {
+            loadCustomerDashboard();
+        });
+
+        // تحميل بيانات لوحة التحكم
+        function loadCustomerDashboard() {
+            loadCustomerInfo();
+            loadCustomerOrders();
+            loadCustomerStats();
+        }
+
+        // تحميل معلومات العميل
+        function loadCustomerInfo() {
+            fetch('/api/customer/info')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const user = data.user;
+                        const container = document.getElementById('customerInfo');
+
+                        container.innerHTML = `
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                                <div>
+                                    <p style="color: var(--text-secondary); margin-bottom: 0.5rem;"><strong>الاسم:</strong></p>
+                                    <p style="color: var(--text-primary); font-size: 1.1rem;">${user.name || 'غير محدد'}</p>
+                                </div>
+                                <div>
+                                    <p style="color: var(--text-secondary); margin-bottom: 0.5rem;"><strong>البريد الإلكتروني:</strong></p>
+                                    <p style="color: var(--text-primary); font-size: 1.1rem;">${user.email || 'غير محدد'}</p>
+                                </div>
+                                <div>
+                                    <p style="color: var(--text-secondary); margin-bottom: 0.5rem;"><strong>رقم الهاتف:</strong></p>
+                                    <p style="color: var(--text-primary); font-size: 1.1rem;">${user.phone || 'غير محدد'}</p>
+                                </div>
+                                <div>
+                                    <p style="color: var(--text-secondary); margin-bottom: 0.5rem;"><strong>تاريخ التسجيل:</strong></p>
+                                    <p style="color: var(--text-primary); font-size: 1.1rem;">${new Date(user.created_at).toLocaleDateString('ar-SA')}</p>
+                                </div>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('خطأ في تحميل معلومات العميل:', error);
+                });
+        }
+
+        // تحميل طلبات العميل
+        function loadCustomerOrders() {
+            fetch('/api/user_orders')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // عرض جميع الطلبات
+                        displayRecentOrders(data.orders);
+                    } else {
+                        document.getElementById('recentOrdersList').innerHTML = `
+                            <div style="text-align: center; padding: 2rem;">
+                                <i class="fa-solid fa-shopping-bag" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
+                                <p style="color: var(--text-secondary);">لا توجد طلبات بعد</p>
+                                <a href="{{ url_for('search') }}" class="btn btn-primary" style="margin-top: 1rem;">ابدأ التسوق</a>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('خطأ في تحميل الطلبات:', error);
+                    document.getElementById('recentOrdersList').innerHTML = `
+                        <div style="text-align: center; padding: 2rem;">
+                            <p style="color: var(--text-secondary);">حدث خطأ في تحميل الطلبات</p>
+                        </div>
+                    `;
+                });
+        }
+
+        // عرض الطلبات الأخيرة
+        function displayRecentOrders(orders) {
+            const container = document.getElementById('recentOrdersList');
+
+            if (orders.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 2rem;">
+                        <i class="fa-solid fa-shopping-bag" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
+                        <p style="color: var(--text-secondary);">لا توجد طلبات بعد</p>
+                        <a href="{{ url_for('search') }}" class="btn btn-primary" style="margin-top: 1rem;">ابدأ التسوق</a>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '<div class="orders-grid">';
+            orders.forEach(order => {
+                const statusText = getStatusText(order.status);
+                const statusClass = getStatusClass(order.status);
+
+                html += `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <h4><i class="fa-solid fa-shopping-bag"></i> طلب رقم: ${order.id}</h4>
+                            <span class="order-status ${statusClass}">${statusText}</span>
+                        </div>
+                        <div class="order-details">
+                            <p><i class="fa-solid fa-money-bill"></i> <strong>المبلغ:</strong> ${order.total_amount} ريال</p>
+                            <p><i class="fa-solid fa-credit-card"></i> <strong>طريقة الدفع:</strong> ${order.payment_method || 'غير محدد'}</p>
+                            <p><i class="fa-solid fa-calendar"></i> <strong>التاريخ:</strong> ${new Date(order.created_at).toLocaleDateString('ar-SA')}</p>
+                            <p><i class="fa-solid fa-box"></i> <strong>عدد المنتجات:</strong> ${order.items_count || order.items?.length || 0}</p>
+                        </div>
+                        <div class="order-actions">
+                            <button class="btn btn-sm btn-primary" onclick="viewOrderDetails('${order.id}')">
+                                <i class="fa-solid fa-eye"></i> عرض التفاصيل
+                            </button>
+                            <button class="btn btn-sm btn-secondary" onclick="trackOrder('${order.id}')">
+                                <i class="fa-solid fa-map-marker-alt"></i> تتبع الطلب
+                            </button>
+                            ${(order.status === 'paid' || order.status === 'shipped' || order.status === 'delivered' || order.status === 'received') && order.items ? `
+                                <div style="margin-top: 0.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                    ${order.items.map(item => `
+                                        <button class="btn btn-sm btn-info" onclick="showReplacementModal('${order.id}', '${item.id}', '${item.product_id}')" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;">
+                                            <i class="fa-solid fa-exchange-alt"></i> استبدال
+                                        </button>
+                                        <button class="btn btn-sm btn-warning" onclick="showReturnModal('${order.id}', '${item.id}')" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;">
+                                            <i class="fa-solid fa-undo"></i> استرجاع
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // تحميل إحصائيات العميل
+        function loadCustomerStats() {
+            fetch('/api/customer/stats')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const stats = data.stats;
+                        document.getElementById('totalOrdersCount').textContent = stats.total_orders || 0;
+                        document.getElementById('completedOrdersCount').textContent = stats.completed_orders || 0;
+                        document.getElementById('shippingOrdersCount').textContent = stats.shipping_orders || 0;
+                        document.getElementById('totalSpent').textContent = (stats.total_spent || 0).toLocaleString('ar-SA') + ' ريال';
+                    }
+                })
+                .catch(error => {
+                    console.error('خطأ في تحميل الإحصائيات:', error);
+                });
+        }
+
+        // الحصول على نص الحالة
+        function getStatusText(status) {
+            const statusMap = {
+                'pending_payment': 'في انتظار الدفع',
+                'paid': 'تم الدفع',
+                'shipped': 'قيد الشحن',
+                'delivered': 'تم التوصيل',
+                'received': 'تم الاستلام',
+                'cancelled': 'ملغي'
+            };
+            return statusMap[status] || status;
+        }
+
+        // الحصول على كلاس الحالة
+        function getStatusClass(status) {
+            const classMap = {
+                'pending_payment': 'status-warning',
+                'paid': 'status-info',
+                'shipped': 'status-primary',
+                'delivered': 'status-success',
+                'received': 'status-success',
+                'cancelled': 'status-error'
+            };
+            return classMap[status] || '';
+        }
+
+        // عرض تفاصيل الطلب
+        function viewOrderDetails(orderId) {
+            window.location.href = `/track_order/${orderId}`;
+        }
+
+        // تتبع الطلب
+        function trackOrder(orderId) {
+            window.location.href = `/track_order/${orderId}`;
+        }
+
+        // تسجيل الخروج
+        function logout() {
+            if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+                fetch('/admin/logout')
+                    .then(() => {
+                        window.location.href = '{{ url_for("index") }}';
+                    });
+            }
+        }
+
+        // إظهار الإشعارات
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <i class="fa-solid fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'times-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            `;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+    </script>
+</body>
+
+</html>

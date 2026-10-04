@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الملف الشخصي - الشامل</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fa-solid fa-car"></i>
+                    <h1><a href="{{ url_for('index') }}" style="text-decoration: none; color: inherit;">الشامل</a></h1>
+                </div>
+                <nav class="nav">
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                        <li><a href="{{ url_for('search') }}">البحث</a></li>
+                        <li><a href="{{ url_for('orders') }}">الطلبات</a></li>
+                        <li><a href="{{ url_for('profile') }}" class="active">الملف الشخصي</a></li>
+                    </ul>
+                </nav>
+                <div class="header-actions">
+                    <a href="{{ url_for('index') }}" class="btn btn-secondary"><i class="fa-solid fa-home"></i> الرئيسية</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Profile Section -->
+    <section class="profile-section">
+        <div class="container">
+            <div class="profile-container">
+                <div class="profile-header">
+                    <div class="profile-avatar" style="width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 3rem; color: white; font-weight: bold;">
+                        م
+                    </div>
+                    <div class="profile-info" style="text-align: center;">
+                        <h2 id="userName" style="margin-bottom: 0.5rem;">جاري التحميل...</h2>
+                        <p id="userEmail" style="color: var(--text-muted); margin-bottom: 0.25rem;">جاري التحميل...</p>
+                        <p id="userType" style="display: inline-block; padding: 0.25rem 1rem; background: var(--primary-color); color: white; border-radius: 20px; font-size: 0.875rem;">عميل</p>
+                    </div>
+                </div>
+
+                <div class="profile-tabs">
+                    <button class="tab-btn active" data-tab="personal"><i class="fa-solid fa-user"></i> المعلومات الشخصية</button>
+                    <button class="tab-btn" data-tab="orders"><i class="fa-solid fa-shopping-bag"></i> طلباتي</button>
+                    <button class="tab-btn" data-tab="favorites"><i class="fa-solid fa-heart"></i> المفضلة</button>
+                    <button class="tab-btn" data-tab="addresses"><i class="fa-solid fa-map-marker-alt"></i> العناوين</button>
+                    <button class="tab-btn" data-tab="history"><i class="fa-solid fa-history"></i> سجل البحث</button>
+                    <button class="tab-btn" data-tab="settings"><i class="fa-solid fa-cog"></i> الإعدادات</button>
+                </div>
+
+                <div class="tab-content">
+                    <!-- Personal Information Tab -->
+                    <div class="tab-panel active" id="personal">
+                        <div class="profile-form">
+                            <h3>المعلومات الشخصية</h3>
+                            <form id="profileForm">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="fullName">الاسم الكامل</label>
+                                        <input type="text" id="fullName" name="fullName" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="email">البريد الإلكتروني</label>
+                                        <input type="email" id="email" name="email" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="phone">رقم الهاتف</label>
+                                        <input type="tel" id="phone" name="phone" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="city">المدينة</label>
+                                        <input type="text" id="city" name="city" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="userType">نوع الحساب</label>
+                                    <input type="text" id="userType" name="userType" readonly>
+                                </div>
+                                <button type="button" class="btn btn-primary" onclick="editProfile()">تعديل المعلومات</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Orders Tab -->
+                    <div class="tab-panel" id="orders">
+                        <div class="orders-list">
+                            <h3>طلباتي</h3>
+                            <div class="orders-grid" id="userOrders">
+                                <!-- سيتم ملؤها بواسطة JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Favorites Tab -->
+                    <div class="tab-panel" id="favorites">
+                        <div class="favorites-list">
+                            <h3><i class="fa-solid fa-heart"></i> المنتجات المفضلة</h3>
+                            <div class="products-grid" id="favoriteProducts">
+                                <div style="text-align: center; padding: 3rem;">
+                                    <i class="fa-solid fa-heart" style="font-size: 4rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
+                                    <h4>لا توجد منتجات مفضلة</h4>
+                                    <p>ابدأ بإضافة منتجات إلى قائمة المفضلة لديك</p>
+                                    <a href="{{ url_for('search') }}" class="btn btn-primary"><i class="fa-solid fa-search"></i> تصفح المنتجات</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Addresses Tab -->
+                    <div class="tab-panel" id="addresses">
+                        <div class="addresses-list">
+                            <h3><i class="fa-solid fa-map-marker-alt"></i> العناوين المحفوظة</h3>
+                            <button class="btn btn-primary" onclick="showAddAddressModal()" style="margin-bottom: 1.5rem;">
+                                <i class="fa-solid fa-plus"></i> إضافة عنوان جديد
+                            </button>
+                            <div class="addresses-grid" id="savedAddresses">
+                                <div class="address-card" style="border: 1px solid var(--border-color); padding: 1.5rem; border-radius: 8px;">
+                                    <div class="address-header" style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                                        <h4><i class="fa-solid fa-home"></i> المنزل</h4>
+                                        <span class="badge" style="background: var(--primary-color); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.875rem;">افتراضي</span>
+                                    </div>
+                                    <p><strong>العنوان:</strong> عرعر، حي السليمانية، شارع الملك فهد</p>
+                                    <p><strong>الهاتف:</strong> 0501234567</p>
+                                    <div class="address-actions" style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                                        <button class="btn btn-sm btn-primary"><i class="fa-solid fa-edit"></i> تعديل</button>
+                                        <button class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i> حذف</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- History Tab -->
+                    <div class="tab-panel" id="history">
+                        <div class="history-list">
+                            <h3><i class="fa-solid fa-history"></i> سجل البحث</h3>
+                            <button class="btn btn-secondary" onclick="clearSearchHistory()" style="margin-bottom: 1.5rem;">
+                                <i class="fa-solid fa-trash"></i> مسح السجل
+                            </button>
+                            <div class="history-grid" id="searchHistory">
+                                <div class="history-item" style="border: 1px solid var(--border-color); padding: 1rem; border-radius: 8px; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <i class="fa-solid fa-search"></i>
+                                        <span>فلتر زيت كامري 2020</span>
+                                    </div>
+                                    <span style="color: var(--text-muted); font-size: 0.875rem;">منذ ساعتين</span>
+                                </div>
+                                <div class="history-item" style="border: 1px solid var(--border-color); padding: 1rem; border-radius: 8px; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <i class="fa-solid fa-search"></i>
+                                        <span>فرامل أمامية</span>
+                                    </div>
+                                    <span style="color: var(--text-muted); font-size: 0.875rem;">أمس</span>
+                                </div>
+                                <div class="history-item" style="border: 1px solid var(--border-color); padding: 1rem; border-radius: 8px; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <i class="fa-solid fa-search"></i>
+                                        <span>بطارية 70 أمبير</span>
+                                    </div>
+                                    <span style="color: var(--text-muted); font-size: 0.875rem;">منذ 3 أيام</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Settings Tab -->
+                    <div class="tab-panel" id="settings">
+                        <div class="settings-form">
+                            <h3><i class="fa-solid fa-cog"></i> إعدادات الحساب</h3>
+                            <form id="settingsForm" onsubmit="changePassword(event)">
+                                <div class="form-group">
+                                    <label for="currentPassword"><i class="fa-solid fa-lock"></i> كلمة المرور الحالية</label>
+                                    <input type="password" id="currentPassword" name="currentPassword" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newPassword"><i class="fa-solid fa-key"></i> كلمة المرور الجديدة</label>
+                                    <input type="password" id="newPassword" name="newPassword" required minlength="6">
+                                </div>
+                                <div class="form-group">
+                                    <label for="confirmNewPassword"><i class="fa-solid fa-check"></i> تأكيد كلمة المرور الجديدة</label>
+                                    <input type="password" id="confirmNewPassword" name="confirmNewPassword" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary"><i class="fa-solid fa-save"></i> حفظ التغييرات</button>
+                            </form>
+                            
+                            <hr style="margin: 2rem 0;">
+                            
+                            <div class="danger-zone" style="border: 2px solid var(--error-color); padding: 1.5rem; border-radius: 8px;">
+                                <h4 style="color: var(--error-color);"><i class="fa-solid fa-exclamation-triangle"></i> منطقة الخطر</h4>
+                                <p>حذف الحساب نهائياً - هذا الإجراء لا يمكن التراجع عنه</p>
+                                <button class="btn btn-danger" onclick="deleteAccount()"><i class="fa-solid fa-trash"></i> حذف الحساب</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>الشامل</h3>
+                    <p>منصة إلكترونية متكاملة لقطع غيار السيارات في عرعر - المملكة العربية السعودية</p>
+                </div>
+                <div class="footer-section">
+                    <h4>روابط سريعة</h4>
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                        <li><a href="{{ url_for('search') }}">البحث</a></li>
+                        <li><a href="{{ url_for('orders') }}">الطلبات</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>تواصل معنا</h4>
+                    <p>عرعر - المملكة العربية السعودية</p>
+                    <p>البريد الإلكتروني: info@alshamel.com</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 الشامل. جميع الحقوق محفوظة.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // التحقق من تسجيل الدخول أولاً
+        document.addEventListener('DOMContentLoaded', function () {
+            checkLoginStatus();
+        });
+
+        // التحقق من حالة تسجيل الدخول
+        function checkLoginStatus() {
+            fetch('/admin/check_session')
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.logged_in) {
+                        // إذا لم يكن مسجل دخول، توجيهه إلى صفحة تسجيل الدخول
+                        window.location.href = '{{ url_for("admin") }}';
+                        return;
+                    }
+                    // إذا كان مسجل دخول، تحميل البيانات
+                    loadUserProfile();
+                    loadUserOrders();
+                    loadSearchHistory();
+                    loadFavorites();
+                })
+                .catch(error => {
+                    console.error('خطأ في التحقق من تسجيل الدخول:', error);
+                    window.location.href = '{{ url_for("admin") }}';
+                });
+        }
+
+        // تحميل بيانات المستخدم من السيرفر
+        function loadUserProfile() {
+            fetch('/api/customer/info')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.user) {
+                        const user = data.user;
+                        
+                        // تحديث معلومات المستخدم في الصفحة
+                        document.getElementById('userName').textContent = user.name || 'مستخدم';
+                        document.getElementById('userEmail').textContent = user.email || 'لا يوجد بريد';
+                        
+                        // تحديث نوع الحساب
+                        let roleText = 'عميل';
+                        if (user.role === 'admin') roleText = 'مدير';
+                        else if (user.role === 'supplier') roleText = 'مورد';
+                        
+                        document.getElementById('userType').textContent = roleText;
+                        
+                        // تحديث النموذج
+                        document.getElementById('fullName').value = user.name || '';
+                        document.getElementById('email').value = user.email || '';
+                        document.getElementById('phone').value = user.phone || '';
+                        document.getElementById('city').value = user.city || '';
+                        document.getElementById('userType').value = roleText;
+                        
+                        // تحديث الأفاتار
+                        const avatar = document.querySelector('.profile-avatar');
+                        if (avatar && user.name) {
+                            avatar.textContent = user.name.charAt(0).toUpperCase();
+                        }
+                    } else {
+                        console.error('فشل تحميل بيانات المستخدم:', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('خطأ في تحميل بيانات المستخدم:', error);
+                });
+        }
+
+        // تحميل طلبات المستخدم من السيرفر
+        function loadUserOrders() {
+            fetch('/api/user_orders')
+                .then(response => response.json())
+                .then(data => {
+                    const ordersContainer = document.getElementById('userOrders');
+                    
+                    if (!data.success || data.orders.length === 0) {
+                        ordersContainer.innerHTML = `
+                            <div class="no-orders" style="text-align: center; padding: 3rem;">
+                                <h3>لا توجد طلبات</h3>
+                                <p>لم يتم العثور على أي طلبات حتى الآن</p>
+                                <a href="{{ url_for('search') }}" class="btn btn-primary">ابحث عن قطع الالشامل</a>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    let html = '';
+                    data.orders.forEach(order => {
+                        const statusText = getStatusText(order.status);
+                        const statusClass = getStatusClass(order.status);
+                        
+                        html += `
+                            <div class="order-card" style="border: 1px solid var(--border-color); padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem; background: var(--bg-card);">
+                                <div class="order-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                    <h4 style="margin: 0;"><i class="fa-solid fa-shopping-bag"></i> طلب رقم: ${order.id}</h4>
+                                    <span class="order-status ${statusClass}" style="padding: 0.25rem 1rem; background: var(--primary-color); color: white; border-radius: 20px; font-size: 0.875rem;">${statusText}</span>
+                                </div>
+                                <div class="order-details">
+                                    <p><i class="fa-solid fa-calendar"></i> <strong>التاريخ:</strong> ${new Date(order.created_at).toLocaleDateString('ar-SA')}</p>
+                                    <p><i class="fa-solid fa-box"></i> <strong>عدد المنتجات:</strong> ${order.items_count || order.items?.length || 0}</p>
+                                    <p><i class="fa-solid fa-money-bill"></i> <strong>المبلغ الإجمالي:</strong> ${order.total_amount} ريال</p>
+                                    <p><i class="fa-solid fa-credit-card"></i> <strong>طريقة الدفع:</strong> ${getPaymentMethodText(order.payment_method)}</p>
+                                </div>
+                                <div class="order-actions" style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                                    <button class="btn btn-sm btn-primary" onclick="viewOrderDetails('${order.id}')">
+                                        <i class="fa-solid fa-eye"></i> عرض التفاصيل
+                                    </button>
+                                    <button class="btn btn-sm btn-secondary" onclick="trackOrder('${order.id}')">
+                                        <i class="fa-solid fa-map-marker-alt"></i> تتبع الطلب
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    ordersContainer.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('خطأ في تحميل الطلبات:', error);
+                    const ordersContainer = document.getElementById('userOrders');
+                    ordersContainer.innerHTML = `
+                        <div class="no-orders" style="text-align: center; padding: 3rem;">
+                            <i class="fa-solid fa-exclamation-triangle" style="font-size: 3rem; color: var(--error-color); margin-bottom: 1rem;"></i>
+                            <h3>خطأ في تحميل الطلبات</h3>
+                            <p>حدث خطأ أثناء محاولة تحميل الطلبات. يرجى المحاولة مرة أخرى.</p>
+                        </div>
+                    `;
+                });
+        }
+
+        // الحصول على نص الحالة
+        function getStatusText(status) {
+            const statusMap = {
+                'pending_payment': 'في انتظار الدفع',
+                'paid': 'تم الدفع',
+                'shipped': 'قيد الشحن',
+                'delivered': 'تم التوصيل',
+                'received': 'تم الاستلام',
+                'cancelled': 'ملغي',
+                'returned': 'تم الإرجاع'
+            };
+            return statusMap[status] || status;
+        }
+
+        // الحصول على كلاس الحالة
+        function getStatusClass(status) {
+            const classMap = {
+                'pending_payment': 'status-warning',
+                'paid': 'status-info',
+                'shipped': 'status-primary',
+                'delivered': 'status-success',
+                'received': 'status-success',
+                'cancelled': 'status-error',
+                'returned': 'status-error'
+            };
+            return classMap[status] || '';
+        }
+
+        // الحصول على نص طريقة الدفع
+        function getPaymentMethodText(method) {
+            const methodMap = {
+                'tabby': 'تابي',
+                'tamara': 'تمارا',
+                'electronic': 'الدفع الإلكتروني',
+                'cash_on_delivery': 'الدفع عند الاستلام',
+                'mada': 'مدى',
+                'visa': 'فيزا / ماستركارد'
+            };
+            return methodMap[method] || method || 'غير محدد';
+        }
+
+        // تحميل سجل البحث
+        function loadSearchHistory() {
+            const searchHistory = JSON.parse(localStorage.getItem('alshamel_search_history') || '[]');
+            const historyContainer = document.getElementById('searchHistory');
+            
+            if (searchHistory.length === 0) {
+                historyContainer.innerHTML = `
+                    <div style="text-align: center; padding: 3rem;">
+                        <i class="fa-solid fa-history" style="font-size: 4rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
+                        <h4>سجل البحث فارغ</h4>
+                        <p>لا يوجد سجل بحث حالياً</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            searchHistory.slice(0, 10).forEach((item, index) => {
+                const timeAgo = getTimeAgo(item.timestamp);
+                html += `
+                    <div class="history-item" style="border: 1px solid var(--border-color); padding: 1rem; border-radius: 8px; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="searchAgain('${item.query}')">
+                        <div>
+                            <i class="fa-solid fa-search"></i>
+                            <span>${item.query}</span>
+                        </div>
+                        <span style="color: var(--text-muted); font-size: 0.875rem;">${timeAgo}</span>
+                    </div>
+                `;
+            });
+            historyContainer.innerHTML = html;
+        }
+
+        // الحصول على الوقت المنقضي
+        function getTimeAgo(timestamp) {
+            const now = new Date();
+            const time = new Date(timestamp);
+            const diff = Math.floor((now - time) / 1000); // بالثواني
+            
+            if (diff < 60) return 'الآن';
+            if (diff < 3600) return `منذ ${Math.floor(diff / 60)} دقيقة`;
+            if (diff < 86400) return `منذ ${Math.floor(diff / 3600)} ساعة`;
+            if (diff < 604800) return `منذ ${Math.floor(diff / 86400)} يوم`;
+            return time.toLocaleDateString('ar-SA');
+        }
+
+        // البحث مرة أخرى
+        function searchAgain(query) {
+            window.location.href = `{{ url_for('search') }}?q=${encodeURIComponent(query)}`;
+        }
+
+        // تحميل المفضلة
+        function loadFavorites() {
+            const favorites = JSON.parse(localStorage.getItem('alshamel_favorites') || '[]');
+            const favoritesContainer = document.getElementById('favoriteProducts');
+            
+            if (favorites.length === 0) {
+                return; // سيظهر المحتوى الافتراضي الموجود في HTML
+            }
+            
+            // جلب تفاصيل المنتجات المفضلة
+            Promise.all(favorites.map(productId => 
+                fetch(`/api/product/${productId}`)
+                    .then(response => response.json())
+                    .then(data => data.success ? data.product : null)
+            ))
+            .then(products => {
+                const validProducts = products.filter(p => p !== null);
+                
+                if (validProducts.length === 0) {
+                    favoritesContainer.innerHTML = `
+                        <div style="text-align: center; padding: 3rem;">
+                            <i class="fa-solid fa-heart" style="font-size: 4rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
+                            <h4>لا توجد منتجات مفضلة</h4>
+                            <p>ابدأ بإضافة منتجات إلى قائمة المفضلة لديك</p>
+                            <a href="{{ url_for('search') }}" class="btn btn-primary"><i class="fa-solid fa-search"></i> تصفح المنتجات</a>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let html = '<div class="products-grid">';
+                validProducts.forEach(product => {
+                    html += `
+                        <div class="product-card">
+                            <div class="product-image">
+                                <img src="/uploads/${product.image}" alt="${product.name}" onerror="this.src='/static/images/placeholder.jpg'">
+                            </div>
+                            <div class="product-info">
+                                <h3>${product.name}</h3>
+                                <p class="product-part-number">رقم القطعة: ${product.part_number}</p>
+                                <p class="product-brand">${product.brand} - ${product.type}</p>
+                                <div class="product-price">
+                                    <span class="current-price">${product.price} ريال</span>
+                                </div>
+                                <div class="product-actions">
+                                    <button class="btn btn-primary" onclick="viewProduct('${product.id}')">عرض التفاصيل</button>
+                                    <button class="btn btn-danger" onclick="removeFromFavorites('${product.id}')">
+                                        <i class="fa-solid fa-heart-broken"></i> إزالة من المفضلة
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                favoritesContainer.innerHTML = html;
+            })
+            .catch(error => {
+                console.error('خطأ في تحميل المفضلة:', error);
+            });
+        }
+
+        // إزالة من المفضلة
+        function removeFromFavorites(productId) {
+            let favorites = JSON.parse(localStorage.getItem('alshamel_favorites') || '[]');
+            favorites = favorites.filter(id => id !== productId);
+            localStorage.setItem('alshamel_favorites', JSON.stringify(favorites));
+            showNotification('تم إزالة المنتج من المفضلة', 'success');
+            loadFavorites();
+        }
+
+        // تعديل الملف الشخصي
+        function editProfile() {
+            const inputs = document.querySelectorAll('#profileForm input');
+            inputs.forEach(input => {
+                input.removeAttribute('readonly');
+            });
+
+            document.querySelector('#profileForm button').textContent = 'حفظ التغييرات';
+            document.querySelector('#profileForm button').onclick = saveProfile;
+        }
+
+        // حفظ الملف الشخصي
+        function saveProfile() {
+            const formData = new FormData(document.getElementById('profileForm'));
+            
+            // إرسال البيانات إلى السيرفر
+            fetch('/api/customer/update', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('تم حفظ التغييرات بنجاح', 'success');
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    showNotification(data.message || 'فشل حفظ التغييرات', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('خطأ في حفظ الملف الشخصي:', error);
+                showNotification('حدث خطأ في حفظ التغييرات', 'error');
+            });
+        }
+
+        // تبديل التبويبات
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const tabId = this.dataset.tab;
+
+                // إزالة الكلاس النشط من جميع الأزرار والتبويبات
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+                // إضافة الكلاس النشط للعنصر المحدد
+                this.classList.add('active');
+                const targetPanel = document.getElementById(tabId);
+                if (targetPanel) {
+                    targetPanel.classList.add('active');
+                }
+
+                // تحميل البيانات حسب التبويب
+                if (tabId === 'orders') {
+                    loadUserOrders();
+                } else if (tabId === 'history') {
+                    loadSearchHistory();
+                } else if (tabId === 'favorites') {
+                    loadFavorites();
+                }
+            });
+        });
+
+        // تغيير كلمة المرور
+        function changePassword(event) {
+            event.preventDefault();
+            
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmNewPassword').value;
+            
+            if (newPassword !== confirmPassword) {
+                alert('كلمة المرور الجديدة غير متطابقة');
+                return;
+            }
+            
+            if (newPassword.length < 6) {
+                alert('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+                return;
+            }
+            
+            alert('تم تغيير كلمة المرور بنجاح');
+            document.getElementById('settingsForm').reset();
+        }
+
+        // مسح سجل البحث
+        function clearSearchHistory() {
+            if (confirm('هل أنت متأكد من مسح سجل البحث؟')) {
+                localStorage.removeItem('alshamel_search_history');
+                loadSearchHistory();
+                showNotification('تم مسح سجل البحث بنجاح', 'success');
+            }
+        }
+
+        // إضافة عنوان جديد
+        function showAddAddressModal() {
+            alert('سيتم إضافة نموذج إضافة عنوان قريباً');
+        }
+
+        // حذف الحساب
+        function deleteAccount() {
+            const confirmation = prompt('للتأكيد، اكتب "حذف الحساب"');
+            if (confirmation === 'حذف الحساب') {
+                alert('تم حذف الحساب بنجاح');
+                window.location.href = '{{ url_for("index") }}';
+            }
+        }
+
+        // إشعار
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: var(--bg-card);
+                color: var(--text-primary);
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                border-left: 4px solid ${type === 'success' ? 'var(--success-color)' : type === 'error' ? 'var(--error-color)' : 'var(--primary-color)'};
+            `;
+            
+            const icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle';
+            notification.innerHTML = `
+                <i class="fa-solid ${icon}"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // عرض تفاصيل الطلب
+        function viewOrderDetails(orderId) {
+            window.location.href = `/track_order/${orderId}`;
+        }
+
+        // تتبع الطلب
+        function trackOrder(orderId) {
+            window.location.href = `/track_order/${orderId}`;
+        }
+
+        // عرض منتج
+        function viewProduct(productId) {
+            window.location.href = `/product/${productId}`;
+        }
+
+        // تحميل البيانات عند فتح الصفحة
+        // تم نقله إلى checkLoginStatus
+    </script>
+</body>
+
+</html>
