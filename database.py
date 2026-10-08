@@ -180,7 +180,7 @@ def insert_initial_data(conn):
     cursor.execute('''
         INSERT INTO users (username, password, name, email, role, city)
         VALUES (?, ?, ?, ?, ?, ?)
-    ''', ('admin', 'admin123', 'مدير النظام', 'admin@alshamel.com', 'admin', 'عرعر'))
+    ''', ('admin', '', 'مدير النظام', 'admin@alshamel.com', 'admin', 'عرعر'))
     
     # إضافة موردين
     suppliers = [
